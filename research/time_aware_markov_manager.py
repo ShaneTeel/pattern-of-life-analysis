@@ -1,9 +1,11 @@
+from __future__ import annotations
+
 import numpy as np
 import pandas as pd
 from typing import Literal
 
-from mobility.predict import MarkovChain, MarkovEvaluator
-from mobility.utils import get_logger
+from polkit.strategy import MarkovChain, MarkovEvaluator
+from polkit.utils import get_logger
 
 logger = get_logger(__name__)
 

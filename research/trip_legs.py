@@ -1,10 +1,12 @@
+from __future__ import annotations
+
 import numpy as np
 import pandas as pd
 from datetime import timedelta
 from shapely.geometry import LineString
 
-from mobility.analyze import great_circle_distance
-from mobility.utils import get_logger
+from polkit.analyze import great_circle_distance
+from polkit.utils import get_logger
 
 logger = get_logger(__name__)
 
