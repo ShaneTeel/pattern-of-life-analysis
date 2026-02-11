@@ -20,6 +20,10 @@ An individual-level analytics framework designed to expedite key steps in patter
 ## Demo
 [Launch Demo](https://pattern-of-life-analysis.streamlit.app)
 
+### Example Output (Taxonomy) 
+![Global View](./media/tax-global-view.png)
+![Local View](./media/tax-local-view.png)
+
 [Return to TOC](#table-of-contents)
 
 ## Key Features
@@ -188,8 +192,23 @@ $$t_{1/2} = {30}\text{ days }\text{(default value)}$$
 
 ## Citation
 
+If you use this package or software, please cite it as follows:
+
+```bibtex
+@misc{ShaneTeel2026,
+    author = {Shane Teel},
+    title = {Pattern-of-Life Analysis},
+    howpublished = {\url{https://github.com/ShaneTeel/pattern-of-life-analysis}},
+    year = {2026},
+    note = {Version 0.1.0, accessed February 11, 2026}}
+```
+
 [Return to TOC](#table-of-contents)
 
 ## License
+
+This project is licensed under the term of the [GNU General Public License v3.0](./LICENSE)
+
+**Copyright (c) 2026 Shane Teel**
 
 [Return to TOC](#table-of-contents)
