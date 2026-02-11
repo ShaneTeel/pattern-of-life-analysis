@@ -22,7 +22,7 @@ class NetworkBuilder:
         fig = go.Figure(
             data=[*edges, nodes],
             layout=go.Layout(
-                title="Movement Strategy",
+                title="Transition Network",
                 showlegend=False,
                 hovermode="closest",
                 xaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
