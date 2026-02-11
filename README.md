@@ -46,20 +46,11 @@ An individual-level analytics framework designed to expedite key steps in patter
 - From scratch metrics for evaluating Markov chain's performance
 
 ### Performance
-```html
-|=============================================================================================================================|
-|                                               MarkovChain Evaluator Results                                                 |
-|=============================================================================================================================|
-|                 User 000                |                 User 003                |                 User 014                |
-|=========================================|=========================================|=========================================|
-|    Next-Step Accuracy: 22.73%           |    Next-Step Accuracy: 18.75%           |    Next-Step Accuracy: 44.44%           |
-|    Top-3 Accuracy: 43.18%               |    Top-3 Accuracy: 51.95%               |    Top-3 Accuracy: 50.00%               |
-|    # of Test States: 10                 |    # of Test States: 18                 |    # of Test States: 8                  |
-|    Baseline Comparison:                 |    Baseline Comparison:                 |    Baseline Comparison:                 |
-|        Random top-3 accuracy: 30.00%    |        Random top-3 accuracy: 16.67%    |        Random top-3 accuracy: 37.50%    |
-|        Model Improvement: 43.94%        |        Model Improvement: 211.72%       |        Model Improvement: 33.33%        |
-|=============================================================================================================================|
-```
+| User | Test States | Next-Step | Top-3  | Baseline | Improvement |
+|------|-------------|-----------|--------|----------|-------------|
+| 000  | 10          | 22.73%    | 43.18% | 30.00%   | +43.94%     |
+| 003  | 18          | 18.75%    | 51.95% | 16.67%   | +211.72%    |
+| 014  | 8           | 44.44%    | 50.00% | 37.50%   | +33.33%     |
 
 [Return to TOC](#table-of-contents)
 
@@ -91,14 +82,12 @@ python ./scripts/screen_geolife_users.py
 This project uses the [GeoLife GPS Trajectories Dataset](https://www.microsoft.com/en-us/research/publication/geolife-gps-trajectory-dataset-user-guide/) published by Microsoft Research Group Asia for academic and research purposes. All data is anonymized and used in accordance with the dataset's intended research scope regarding human mobility analytics.
 
 The techniques applied in the PoLKit package have legitimate applications in:
-- Urban planning and transporation
+- Urban planning and transportation
 - Public health modeling
 - Location-based service development
 - Academic mobility studies
 
 This is a portfolio project to demonstrate technical skills in geospatial analysis, behavioral profiling, and predictive modeling.
-
-This project is not to be used to violate any personal privacy laws. 
 
 ## Project Structure
 ```
@@ -119,7 +108,7 @@ polkit/
 ### Pipeline Overview
 ```mermaid
 ---
-title: Pattern-of-Life Anlaysis Steps
+title: Pattern-of-Life Analysis Steps
 ---
 flowchart LR;
     A([Load GPS Traces]) --> B;
@@ -153,7 +142,7 @@ flowchart LR;
 
 ## Methods
 ### Loyalty Metric
-`Loyalty` is the geometric mean of `Maturity`, `Saturation`, and `Attenuation` (described below). `Loyalty` measures the stability of a user's relationship with a location over time. A user's Loyalty to a location correlates with the number of visits to that location and the recency of those visits, with the score nearing zero as a location "fades" from a user's short-term location memory (history).  
+`Loyalty` measures the stability of a user's relationship with a location over time. A user's Loyalty to a location correlates with the number of visits to that location and the recency of those visits, with the score nearing zero as a location "fades" from a user's short-term location memory (history). `Loyalty` is computed as the geometric mean of `Maturity`, `Saturation`, and `Attenuation` (described below).  
 
 $$\text{Loyalty} = ({Maturity}\times{Saturation}\times{Attenuation})^{\large\frac{1}{3}}$$
 
