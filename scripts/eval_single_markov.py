@@ -15,7 +15,7 @@ logger = get_logger(__name__)
 if __name__=="__main__":
 
     # Declare source info
-    user_id = "003"
+    user_id = "014"
     data_path = f"./app/data/user_{user_id}.pkl"
     user_id = data_path.split("/")[2]
     

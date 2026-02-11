@@ -7,28 +7,28 @@ An individual-level analytics framework designed to expedite key steps in patter
 - Modeling an individual's movement pattern to determine both the likelihood of a transition and the confidence in that assessment
 
 ## Table-of-Contents
-- [Demo / Examples](#demo--examples)
+- [Demo](#demo)
 - [Key Features](#key-features)
 - [Quick Start](#quick-start)
+- [Data Source](#data-source)
 - [Project Structure](#project-structure)
-- [Methodology](#methodlogy)
-- [Trade-Offs](#trade-offs)
-- [Classical vs. Deep Learning](#classical-vs-deep-learning)
-- [To-Do](#to-do)
+- [Workflow](#workflow)
+- [Methods](#methods)
+- [Citation](#citation)
+- [License](#license)
 
-## Demo / Example Outputs
-
-### Streamlit App
+## Demo
 [Launch Demo](https://pattern-of-life-analysis.streamlit.app)
-
-### Examples
-[Guided Walk-Through](https://)
-
 
 [Return to TOC](#table-of-contents)
 
 ## Key Features
-### GPS Transformation
+
+### Data Quality Assessment
+- Temporal analyzer to evaluate raw GPS datasets temporal completeness, density/distribution, and resolution
+- Spatial measurements for calculating radius of gyration, great circle distance, and center of mass
+
+### Location Mining
 - From scratch Stay-Point detection
 - Stay-Point clustering with DBSCAN 
 
@@ -38,32 +38,22 @@ An individual-level analytics framework designed to expedite key steps in patter
 - Characterization of a user's spatial focus (sprawl) while at a location
 
 ### Location Transition Mapping
-- From scratch first-order Markov Chain 
-- Optional bird's eye view projection of extracted features
-- Real-time video processing with temporal smoothing
+- From scratch first-order Markov Chain with Next-Location Prediction (see performance below)
+- From scratch metrics for evaluating Markov chain's performance
 
 ### Performance
 ```html
-=======================================|
-MarkovChain Evaluator Results          |
-=======================================|
-User 003                               |
-=======================================|
-    Next-Step Accuracy: 44.44%         |
-    Top-3 Accuracy: 50.00%             |
-    Baseline Comparison:               |
-        Random top-3 accuracy: 37.50%  |
-        Model Improvement: 33.33%      |
-=======================================|
-========================================
-MarkovChain Evaluator Results
-==================================================
-        Next-Step Accuracy: 22.73%
-        Top-3 Accuracy: 43.18%
-        Baseline Comparison:
-                Random top-3 accuracy: 30.00%
-                Model Improvement: 43.94%
-==================================================
+|=============================================================================================================================|
+|                                               MarkovChain Evaluator Results                                                 |
+|=============================================================================================================================|
+|                 User 000                |                 User 003                |                 User 014                |
+|=========================================|=========================================|=========================================|
+|    Next-Step Accuracy: 22.73%           |    Next-Step Accuracy: 18.75%           |    Next-Step Accuracy: 44.44%           |
+|    Top-3 Accuracy: 43.18%               |    Top-3 Accuracy: 51.95%               |    Top-3 Accuracy: 50.00%               |
+|    Baseline Comparison:                 |    Baseline Comparison:                 |    Baseline Comparison:                 |
+|        Random top-3 accuracy: 30.00%    |        Random top-3 accuracy: 16.67%    |        Random top-3 accuracy: 37.50%    |
+|        Model Improvement: 43.94%        |        Model Improvement: 211.72%       |        Model Improvement: 33.33%        |
+|=============================================================================================================================|
 ```
 
 [Return to TOC](#table-of-contents)
@@ -71,163 +61,135 @@ MarkovChain Evaluator Results
 ## Quick Start
 ### Install Package
 ```bash
-git clone https://github.com/ShaneTeel/lane-detection-classic.git
-cd lane-detection-classic
+git clone https://github.com/ShaneTeel/pattern-of-life-analysis.git
+cd pattern-of-life-anlaysis
 
-python -m pip install -e .
+python -m pip install -r requirements.txt
 ```
 
-### Run Demo Scripts
-**Straight Lane Video**
+### Eval a Single User
 ```
-python scripts/straight/straight_edge_direct_demo.py
+python ./scripts/eval_single_markov.py
 ```
-**Curved Lane Video**
-```
-python scripts/curved/curved_edge_direct_demo.py
-```
-### For Single Video / Image processing
-Define your ROI and run:
+### Screen All GeoLife Users
+
+Download the GeoLife Dataset, specify a file-in and file-out (for saving .pkl files) and run:
+
 ```python
-from lane_detection.detection import DetectionSystem
-import numpy as np
-
-roi = np.array([[[100, 540], [900, 540], [525, 325], [445, 325]]])
-
-system = DetectionSystem(
-    source=<"filepath to video goes here">,
-    roi=roi,
-    generator="edge",
-    selector="direct",
-    estimator="ols"
-)
-
-report = system.run("composite", stroke=False, fill=True)
-
-print(report)
+python ./scripts/screen_geolife_users.py
 ```
+
 [Return to TOC](#table-of-contents)
 
+
+## Data Source
+This project uses the [GeoLife GPS Trajectories Dataset](https://www.microsoft.com/en-us/research/publication/geolife-gps-trajectory-dataset-user-guide/) published by Microsoft Research Group Asia for academic and research purposes. All data is anonymized and used in accordance with the dataset's intended research scope in human mobility analytics.
+
+The techniques applied in the PoLKit package have legitimate applications in:
+- Urban planning and transporation
+- Public health modeling
+- Location-based service development
+- Academic mobility studies
+
+This is a portfolio project to demonstrate technical skills in geospatial analysis, behavioral profiling, and predictive modeling.
+
+This project is not to be used to violate any personal privacy laws. 
 
 ## Project Structure
 ```
-lane_detection/
-|-- detection/           # Main pipeline
-│   |-- models/          # OLS, RANSAC, Kalman
-|-- feature_generation/  # Edge/threshold maps
-|-- feature_selection/   # Point extraction
-|-- scalers/             # MinMax, StandardScaler
-|-- image_geometry/      # ROI mask, BEV projection
-|-- studio/              # Visualization
+polkit/
+|-- analyze/             # Spatial & Temporal Metrics
+|-- strategy/            # First-Order Markov chain, Markov Evaluator
+|-- taxonomy/            # Main profiling logic
+│   |-- anchor_points/   # Home / Work Identifiers
+│   |-- location_mining/ # Stay-Point Detection / Clustering
+|-- utils/               # Logging, GeoLife .plt reader/pickler
+|-- visualize/           # Visualizations (Plotly Charts, Folium Maps, NetworkX)
 ```
+
 [Return to TOC](#table-of-contents)
 
-## Methodology
+## Workflow
 
 ### Pipeline Overview
-```mermaid 
+```mermaid
 ---
-title: Lane Line Detection Stages
-id: eb8afec7-e8d6-443b-9df4-357dccd01d6c
+title: Pattern-of-Life Anlaysis Steps
 ---
 flowchart LR;
-    A([Read Image / Video]) --> B;
-    subgraph Feature Generation;
-        B[HSL-Masking] --> |Generator A| CA;
-        CA["Threshold + Morphology<br>(Close --> Dilate)"] --> D;
-        B[HSL-Masking] --> |Generator B| CB;
-        CB["Vertical Edge Detection<br>(Sobel-X)"] --> D
+    A([Load GPS Traces]) --> B;
+
+    subgraph Data Quality Assessment
+        B("Temporal Completeness (Gaps)") --> C;
+        C(Collection Density) --> D;
         end
-    D[Inverse ROI-Masking] --> |Extractor A| EA;
-    D[Inverse ROI-Masking] --> |Extractor B| EB;
-    subgraph Feature Transformation;
-        EA[Probabilistic Hough Lines Transform] --> F;
-        EB[Direct Pixel-Wise Extraction] --> F;
-        F{BEV?} --> |Yes| G;
-        F{BEV?} --> |No| H;
-        G[Perspective Transform] --> H;
+    
+    D(Temporal Resolution) --> E;
+
+    subgraph Location Mining
+        E(Stay-Point Detection) --> F;
         end
-    H[Feature Scaling] --> |Estimator A| IA;
-    H[Feature Scaling] --> |Estimator B| IB
-    subgraph Dynamic Linear Modeling
-        IA["Outlier-Rejection Curve Fitting<br>(RANSAC)"] --> J;
-        IB["Outlier-Sensitive Curve Fitting<br>(OLS)"] --> J;
-        J["Temporal Lane Tracking<br>(Kalman-Filter)"] --> K;
+
+    F(Stay-Point Clustering) --> G;
+    F(Stay-Point Clustering) --> J;
+
+    subgraph Location Profiling;
+        G(Behavioral Profiling) --> H;
+        H(Home / Work Identification);
         end
-    K[Extrapolated Lane-Line Prediction] --> L;
-    L([Visualization]);
+
+    subgraph Transition Network;
+        J(Transition Probability Calculation) --> K;
+        K(Next-Location Prediction)
+        end
 ```
 
 [Return to TOC](#table-of-contents)
 
-## Trade-Offs
-**Feature Generation**
+## Methods
+### Loyalty Metric
+`Loyalty` is the geometric mean of `Maturity`, `Saturation`, and `Attenuation` (described below). `Loyalty` measures the stability of a user's relationship with a location over time. A user's Loyalty to a location correlates with the number of visits to that location and the recency of those visits, with the score nearing zero as a location "fades" from a user's short-term location memory (history).  
 
-*Thresh*
-- Amplifies both good pixel coordinates and bad pixel coordinates.
-- Useful when the actual lane lines are faded / worn.
+$$\text{Loyalty} = ({Maturity}\times{Saturation}\times{Attenuation})^{\large\frac{1}{3}}$$
 
-*Edge*
-- Rejects noise resulting from horizontal lines
-- Can generate too few points; not enough features to generate the right fit. 
+**Maturity (Principle / Starting Value)**
 
-**Feature Selection**
+`Maturity` is the ratio of days visited to the number of active collection days in the entire dataset. `Maturity` is the starting value and, despite it's name, does not actually reflect it's maturity. The subsequent computations result in in the variable's maturation.
 
-*Hough*
-- Struggles with curved roads. 
-- If BEV Transform were applied prior to `cv2.HoughLinesP()`, this issue is likely mitigated, but requires camera parameters (not included in this exercise).
+$$\text{Maturity} = \frac{NumDaysVisited}{NumCollectionDates}$$
 
-*Direct*
-- Much less resilient to outliers
-- Requires special attention to the `n_std` argument to ensure outliers are filtered out appropriately.
+**Saturation (Learn-Rate)**
 
-**Estimators**
+`Saturation` is an inverted exponential decay model with a default threshold value of 10 visits. If a user only visits a location 10 times, the locations maturity is attrited by half. 
 
-*RANSAC*
-- Struggles with curved roads. 
-- As polynomial degree increases, the minimum sample size needed results in an unstable fit. 
-- Can reduce computational speed.
 
-*OLS*
-- Not very resistent to outliers.
-- Requires a more deliberate feature generation / selection to ensure proper outliers filtering.
+$$\text{Saturation} = 1 - e^{\large(\frac{\ln(0.5)}{\nu_{th}}\cdot\small{\sum{visits}})}$$
+$$\nu_{th} = {10}\text{ visits }\text{(default value)}$$
 
-**BEV** (Optional)
-- Aids in generating polylines that conform to the actual lane line locations.
-- Reduces computational speed.
-- Requires camera parameters (not included in this exercise) to improve use.
+**Attenuation (Forget-Rate)**
 
-### Limitations
+`Attenuation` is an exponential decay model with a default half-life of 30 days. If a user has not visited a location in 30-days, the location's maturity attrits by half.
 
-- Struggles with heavy road-noise (i.e., overpasses, road construction change (asphalt --> concrete))
-- Requires manual ROI selection
+$$\text{Attenuation} = e^{\large(\frac{\ln(0.5)}{t_{1/2}}\cdot{\Delta{t}})}$$
+
+$$t_{1/2} = {30}\text{ days }\text{(default value)}$$
+
+### Classification System
+
+**Anchor (top rating)** - It means that location is like the sun and all other activities revolve around it. Typically home is an anchor, but given the quality of the data, Home isn't always categorized as an Anchor.
+
+**Habit (2nd best)** - The user's relationship with the location represents an established habit (think work, the coffee shop you visit every day before work, the gym you visit every day after work).
+
+**Recurring (3rd best)** - User visits this location enough, but visits lack a routine (think grocery store, the movies, etc.). It, like all the other two above, is a destination, but it's not one with an established routine (i.e., why it's not a habit).
+
+**Transient (worst)** - Either not a destination (i.e., a way-point) or a location that lacks enough history to be qualified for any other class. Think of transient as an outlier.
 
 [Return to TOC](#table-of-contents)
 
-## Classical vs. Deep Learning
-This project demonstrates **fundamental understanding** of classical computer vision techniques.
-
-### Benefits of Classical CV
-
-**The User Can Learn**:
-- Coordinate transformation (homography)
-- State estimation and filtering (Kalman)
-- Robust regression techniques (outlier-rejection w/ RANSAC)
-- Production system design (modularity, testing, logging, etc.)
-
-**When to Use Classical**:
-- System is resource constrained
-- Interpretebility is critical
-- Edge deployments, or more to the point, when a GPU is not needed
-- Edge cases that challenge failure response
-
-**Coming Soon!**: Comparitive analysis with YOLOv8 implementation
-- Following implementation, author will update with a more thorough examination of the two approaches (classic vs deep learning).
-
+## Citation
 
 [Return to TOC](#table-of-contents)
 
-## To-Do
-- Add unit tests for critical modules (e.g., Kalman, RANSAC, OLS, BEV/Homography).
+## License
 
 [Return to TOC](#table-of-contents)
