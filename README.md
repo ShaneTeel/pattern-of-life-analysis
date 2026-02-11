@@ -54,6 +54,7 @@ An individual-level analytics framework designed to expedite key steps in patter
 |=========================================|=========================================|=========================================|
 |    Next-Step Accuracy: 22.73%           |    Next-Step Accuracy: 18.75%           |    Next-Step Accuracy: 44.44%           |
 |    Top-3 Accuracy: 43.18%               |    Top-3 Accuracy: 51.95%               |    Top-3 Accuracy: 50.00%               |
+|    # of Test States: 10                 |    # of Test States: 18                 |    # of Test States: 8                  |
 |    Baseline Comparison:                 |    Baseline Comparison:                 |    Baseline Comparison:                 |
 |        Random top-3 accuracy: 30.00%    |        Random top-3 accuracy: 16.67%    |        Random top-3 accuracy: 37.50%    |
 |        Model Improvement: 43.94%        |        Model Improvement: 211.72%       |        Model Improvement: 33.33%        |
@@ -87,7 +88,7 @@ python ./scripts/screen_geolife_users.py
 
 
 ## Data Source
-This project uses the [GeoLife GPS Trajectories Dataset](https://www.microsoft.com/en-us/research/publication/geolife-gps-trajectory-dataset-user-guide/) published by Microsoft Research Group Asia for academic and research purposes. All data is anonymized and used in accordance with the dataset's intended research scope in human mobility analytics.
+This project uses the [GeoLife GPS Trajectories Dataset](https://www.microsoft.com/en-us/research/publication/geolife-gps-trajectory-dataset-user-guide/) published by Microsoft Research Group Asia for academic and research purposes. All data is anonymized and used in accordance with the dataset's intended research scope regarding human mobility analytics.
 
 The techniques applied in the PoLKit package have legitimate applications in:
 - Urban planning and transporation
@@ -158,7 +159,7 @@ $$\text{Loyalty} = ({Maturity}\times{Saturation}\times{Attenuation})^{\large\fra
 
 **Maturity (Principle / Starting Value)**
 
-`Maturity` is the ratio of days visited to the number of active collection days in the entire dataset. `Maturity` is the starting value and, despite it's name, does not actually reflect it's maturity. The subsequent computations result in in the variable's maturation.
+`Maturity` is the ratio of days visited to the number of active collection days in the entire dataset. `Maturity` is the starting value and, despite it's name, does not actually reflect a location's maturity. The subsequent computations result in in the variable's maturation.
 
 $$\text{Maturity} = \frac{NumDaysVisited}{NumCollectionDates}$$
 
@@ -180,13 +181,13 @@ $$t_{1/2} = {30}\text{ days }\text{(default value)}$$
 
 ### Classification System
 
-**Anchor (top rating)** - It means that location is like the sun and all other activities revolve around it. Typically home is an anchor, but given the quality of the data, Home isn't always categorized as an Anchor.
+**Anchor (top rating)** - The location represents the center of gravity for a User's movements. Home is typically an anchor. However, data quality will ultimately affect classification.
 
-**Habit (2nd best)** - The user's relationship with the location represents an established habit (think work, the coffee shop you visit every day before work, the gym you visit every day after work).
+**Habit (2nd best)** - The user's relationship with the location represents an established habit (work, the coffee shop someone visits every day prior to work or the gym someone visits every day after work).
 
-**Recurring (3rd best)** - User visits this location enough, but visits lack a routine (think grocery store, the movies, etc.). It, like all the other two above, is a destination, but it's not one with an established routine (i.e., why it's not a habit).
+**Recurring (3rd best)** - User visits the location frequently, but the visits lack a routine (a grocery store, the movies, etc.). It, like all the other two above, is a destination, but it's not one with an established routine (i.e., why it's not a habit).
 
-**Transient (worst)** - Either not a destination (i.e., a way-point) or a location that lacks enough history to be qualified for any other class. Think of transient as an outlier.
+**Transient (worst)** - Either not a destination (i.e., a way-point) or a location that lacks enough history to be qualified for any other class (Transient == Outlier).
 
 [Return to TOC](#table-of-contents)
 
