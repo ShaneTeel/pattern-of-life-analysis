@@ -16,41 +16,55 @@ An individual-level analytics framework designed to expedite key steps in patter
 - [Classical vs. Deep Learning](#classical-vs-deep-learning)
 - [To-Do](#to-do)
 
-## Guided Walk-Through / Static Outputs
-
-
-
+## Demo / Example Outputs
 
 ### Streamlit App
 [Launch Demo](https://pattern-of-life-analysis.streamlit.app)
 
+### Examples
+[Guided Walk-Through](https://)
+
+
 [Return to TOC](#table-of-contents)
 
 ## Key Features
-### From-Scratch Implementation
-- Kalman filter with adapative measurements for noise
-- RANSAC with dynamic iteration calculation
-- Homography via Direct Linear Transformation
-    - No camera calibration or parameters required
+### GPS Transformation
+- From scratch Stay-Point detection
+- Stay-Point clustering with DBSCAN 
 
-### Production Engineering
-- Modular architecture with interchangeable steps
-- Pydantic paramter configuration validation
-- Comprehensive logging
-- Grid search hyperparamter optimization
+### Location Profiling
+- Configurable Anchor Point (Home / Work) identification
+- Behavioral profiling based on temporal patterns
+- Characterization of a user's spatial focus (sprawl) while at a location
 
-### Flexible Pipeline
-- Customizable approaches (edge/thresh, direct/hough, ols/ransac)
+### Location Transition Mapping
+- From scratch first-order Markov Chain 
 - Optional bird's eye view projection of extracted features
 - Real-time video processing with temporal smoothing
 
 ### Performance
-- **R2 Score**: 0.94-0.99, configuration dependent
-- **Tested on**:
-    - Straight roads
-    - Curved roads
-    - Worn lane lines
-    - Variable lighting
+```html
+=======================================|
+MarkovChain Evaluator Results          |
+=======================================|
+User 003                               |
+=======================================|
+    Next-Step Accuracy: 44.44%         |
+    Top-3 Accuracy: 50.00%             |
+    Baseline Comparison:               |
+        Random top-3 accuracy: 37.50%  |
+        Model Improvement: 33.33%      |
+=======================================|
+========================================
+MarkovChain Evaluator Results
+==================================================
+        Next-Step Accuracy: 22.73%
+        Top-3 Accuracy: 43.18%
+        Baseline Comparison:
+                Random top-3 accuracy: 30.00%
+                Model Improvement: 43.94%
+==================================================
+```
 
 [Return to TOC](#table-of-contents)
 

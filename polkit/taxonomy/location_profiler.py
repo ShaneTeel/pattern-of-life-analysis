@@ -85,6 +85,8 @@ class LocationProfiler:
         if missing:
             raise ValueError(f"DataFrame is missing the following required columns: {missing}")
 
+        locs = locs.copy()
+        
         locs.sort_values(by="arrived", inplace=True)
 
         profile = self._build_profile(locs)
