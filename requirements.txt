@@ -1,2 +1,2 @@
 # GitHub Package
-polkit @ git+https://github.com/ShaneTeel/pattern-of-life-analysis-toolkit.git@main
+polkit @ git+https://github.com/ShaneTeel/pattern-of-life-analysis.git@main

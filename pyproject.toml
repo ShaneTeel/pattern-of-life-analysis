@@ -25,7 +25,6 @@ dependencies = [
     "numpy>=1.24.0",
     "scipy>=1.17.0",
     "pandas>=2.0.0",
-    "networkx>=3.6.1",
     
     "shapely>=2.1.2",
     "geopy>=2.4.1",
@@ -35,13 +34,14 @@ dependencies = [
     "plotly>=6.5.2",
     "calplot>=0.1.7.5",
     "folium<=0.20.0",
+    "networkx>=3.6.1",
 
     "streamlit>=1.33.0",
     "streamlit-folium>=0.26.1"
     ]
 
 [project.urls]
-Homepage = "https://github.com/ShaneTeel/pattern-of-life-analysis-toolkit"
+Homepage = "https://github.com/ShaneTeel/pattern-of-life-analysis"
 
 [tool.setuptools.packages.find]
 where = ["."]
