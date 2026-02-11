@@ -1,0 +1,6 @@
+references/
+logs/
+GeoLife/
+__pycache__/
+*.pyc
+**/*.egg-info/
