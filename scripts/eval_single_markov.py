@@ -3,7 +3,7 @@ import numpy as np
 
 from polkit.taxonomy import *
 from polkit.strategy import *
-from polkit.utils import get_logger, setup_logging, train_test_split, GeoLifeReader
+from polkit.utils import get_logger, setup_logging, train_test_split
 
 setup_logging(
     log_dir="../logs/polkit"
@@ -17,7 +17,6 @@ if __name__=="__main__":
     # Declare source info
     user_id = "014"
     data_path = f"./app/data/user_{user_id}.pkl"
-    user_id = data_path.split("/")[2]
     
     # Initialize Reader / Preprocessor Objects
     detector = StayPointDetector()

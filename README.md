@@ -2,7 +2,7 @@
 
 An individual-level analytics framework designed to expedite key steps in pattern-of-life analysis by:
 - Assessing and visualizing the temporal quality of an individual's raw GPS fixes 
-- Transforming raw GPS fixes into discrete, semantically-labeled locations (features from-scratch Stay-Point Detection)
+- Transforming raw GPS fixes into discrete, semantically-labeled locations
 - Behaviorally profiling an individual's relationship with the semantically-labeled locations
 - Modeling an individual's movement pattern to determine both the likelihood of a transition and the confidence in that assessment
 
@@ -33,7 +33,7 @@ An individual-level analytics framework designed to expedite key steps in patter
 - Spatial measurements for calculating radius of gyration, great circle distance, and center of mass
 
 ### Location Mining
-- From scratch Stay-Point detection
+- Custom Stay-Point detection
 - Stay-Point clustering with DBSCAN 
 
 ### Location Profiling
@@ -42,8 +42,8 @@ An individual-level analytics framework designed to expedite key steps in patter
 - Characterization of a user's spatial focus (sprawl) while at a location
 
 ### Location Transition Mapping
-- From scratch first-order Markov Chain with Next-Location Prediction (see performance below)
-- From scratch metrics for evaluating Markov chain's performance
+- First-order Markov Chain with Next-Location Prediction (see performance below)
+- Evaluation metrics including baseline comparison and improvement calculation
 
 ### Performance
 | User | Test States | Next-Step | Top-3  | Baseline | Improvement |
@@ -62,21 +62,54 @@ cd pattern-of-life-anlaysis
 
 python -m pip install -r requirements.txt
 ```
+### Example Usage
+```python
+import pickle
+import numpy as np
 
-### Eval a Single User
-```
-python ./scripts/eval_single_markov.py
-```
-### Screen All GeoLife Users
+from polkit.taxonomy import StayPointDetector, StayPointClusterer, LocationProfiler
+from polkit.utils import get_logger, setup_logging
 
-Download the GeoLife Dataset, specify a file-in and file-out (for saving .pkl files) and run:
+setup_logging(
+    log_dir="../logs/polkit"
+)
+
+logger = get_logger(__name__)
+
+# Declare source info
+user_id = "014"
+data_path = f"./app/data/user_{user_id}.pkl"
+
+# Initialize Reader / Preprocessor Objects
+detector = StayPointDetector()
+clusterer = StayPointClusterer()
+profiler = LocationProfiler()
+
+# Load Data
+with open(data_path, "rb") as f:
+    try:
+        pfs = pickle.load(f)
+        logger.debug(f"Sucessfully read .pkl file for user {user_id}.")    
+
+    except FileNotFoundError as e:
+        logger.debug(f"A FileNotFoundError occurred: {e}")
+
+sps = detector.detect(pfs)
+locs = clusterer.cluster(sps)
+weights = np.array(locs["n_points"].values)
+
+# Profile User
+profiles = profiler.profile(locs)
+
+logger.info(f"Profiles DataFrame: \n{profiles}")
+```
+### Launch Dashboard
 
 ```python
-python ./scripts/screen_geolife_users.py
+streamlit run ./app/frontend.py
 ```
 
 [Return to TOC](#table-of-contents)
-
 
 ## Data Source
 This project uses the [GeoLife GPS Trajectories Dataset](https://www.microsoft.com/en-us/research/publication/geolife-gps-trajectory-dataset-user-guide/) published by Microsoft Research Group Asia for academic and research purposes. All data is anonymized and used in accordance with the dataset's intended research scope regarding human mobility analytics.
