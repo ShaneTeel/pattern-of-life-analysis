@@ -1,3 +1,4 @@
+import pickle
 import numpy as np
 
 from polkit.taxonomy import *
@@ -14,17 +15,24 @@ logger = get_logger(__name__)
 if __name__=="__main__":
 
     # Declare source info
-    data_path = "./data/000/Trajectory"
+    user_id = "003"
+    data_path = f"./app/data/user_{user_id}.pkl"
     user_id = data_path.split("/")[2]
     
     # Initialize Reader / Preprocessor Objects
-    reader = GeoLifeReader(user_id, data_path)
     detector = StayPointDetector()
     clusterer = StayPointClusterer()
     profiler = LocationProfiler()
 
     # Load / Preprocess Data
-    pfs = reader.load_user()
+    with open(data_path, "rb") as f:
+        try:
+            pfs = pickle.load(f)
+            logger.debug(f"Sucessfully read .pkl file for user {user_id}.")    
+
+        except FileNotFoundError as e:
+            logger.debug(f"A FileNotFoundError occurred: {e}")
+    
     sps = detector.detect(pfs)
     locs = clusterer.cluster(sps)
     weights = np.array(locs["n_points"].values)

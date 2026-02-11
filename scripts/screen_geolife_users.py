@@ -1,4 +1,3 @@
-import pickle
 from pathlib import Path
 
 from polkit.taxonomy import StayPointDetector

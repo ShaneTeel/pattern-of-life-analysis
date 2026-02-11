@@ -6,3 +6,4 @@ from .local_view import show_local_view
 from .location_prediction import train_eval_markov_model
 from .process import run_process
 from .analytic_summary import show_analytic_summary
+from .reset import run_reset

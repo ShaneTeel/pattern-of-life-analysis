@@ -76,15 +76,15 @@ class LocationProfiler:
             A dataframe of all locations profiled according to frequency / regularity and sorted by `routine_score`
         '''
 
+        if len(locs) == 0:
+            logger.warning("Empty DataFrame provided, returning empty results")
+            return pd.DataFrame()
+
         missing = set(self._REQUIRED_COLS) - set(locs.columns)
         
         if missing:
             raise ValueError(f"DataFrame is missing the following required columns: {missing}")
-        
-        if len(locs) == 0:
-            logger.warning("Empty DataFrame provided, returning empty results")
-            return pd.DataFrame()
-        
+
         locs.sort_values(by="arrived", inplace=True)
 
         profile = self._build_profile(locs)

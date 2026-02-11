@@ -50,10 +50,10 @@ def show_location_mining():
         cluster_param_cols = st.columns(2, width="stretch")
             
         with cluster_param_cols[0]:
-            eps_help = """Defines a maximum spatial radius for Stay-Points to be within for them to be considered part of the same location.
+            eps_help = """Defines a maximum spatial radius Stay-Points need to be from each other for them to be considered part of the same location.
             The distance provided is in meters; however, the value is converted to a radian-based distance."""
             eps_dist = st.slider(
-                label="Min Distance (Meters)", 
+                label="Max Distance (Meters)", 
                 min_value=0.1, 
                 max_value=1.0, 
                 value=0.2,

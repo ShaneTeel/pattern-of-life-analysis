@@ -16,11 +16,14 @@ To get started, adjust the configuration options and select the corresponding ac
         process = st.button("Process")
 
     if process:
+        run_reset()
         run_process(det_configs, cluster_configs, sleep_configs, work_configs)
 
     train_eval_markov_model()
 
     show_analytic_summary()
+
+    st.divider()
 
     show_global_view()
     

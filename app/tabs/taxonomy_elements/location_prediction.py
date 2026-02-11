@@ -32,6 +32,10 @@ def train_eval_markov_model():
 
             n_states = len(set(eval.test_states))
             
+            if n_states is None or n_states == 0:
+                st.warning("Arguments for Stay-Point Detection and Stay-Point Clustering are too restrictive. Please adjust before continuing.")
+                st.stop()
+
             rand_top_k = min(eval.k, n_states) / n_states
 
             eval_metrics = {

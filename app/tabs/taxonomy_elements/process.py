@@ -8,11 +8,19 @@ def run_process(det_configs, cluster_configs, sleep_configs, work_configs):
     
     detector = StayPointDetector(**det_configs)
     sps = detector.detect(pfs)
+    if len(sps) < 2 or sps is None:
+        st.warning("Arguments for Stay-Point Detection are too restrictive. Please adjust before continuing.")
+        st.stop()
+
     st.session_state["stay_points"] = sps
-    
+        
     clusterer = StayPointClusterer(**cluster_configs)
     locs = clusterer.cluster(sps)
-    st.session_state["locations"] = locs
+    if len(locs) == 0 or locs is None:
+        st.warning("Arguments for Stay-Point Clustering are too restrictive. Please adjust before continuing.")
+        st.stop()
+        
+    st.session_state["locations"] = locs    
 
     profiler = LocationProfiler(**sleep_configs, **work_configs)
     profiles = profiler.profile(locs)

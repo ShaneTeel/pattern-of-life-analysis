@@ -46,6 +46,9 @@ class StayPointClusterer:
         return DBSCAN(eps=epsilon, min_samples=min_k, metric='haversine', algorithm='ball_tree')
 
     def cluster(self, stay_points:pd.DataFrame):
+        if len(stay_points) < 2:
+            return None
+        
         coords = stay_points[["lat", "lon"]]
         labels = self._cluster_staypoints(coords)
         filtered = self._filter_noise(stay_points, labels)
@@ -60,8 +63,12 @@ class StayPointClusterer:
         return labels
 
     def _evaluate(self, coords, labels):
-        self.score = davies_bouldin_score(coords, labels)
-        logger.info(f"Clustering event resulted in a Davies Bouldin Index of {self.score:.4f}")
+        if labels.nunique() < 2:
+            self.score = None
+            logger.info(f"Clustering event resulted in fewer than 2 labels. Unable to calcualte Davies Bouldin Index.")
+        else:
+            self.score = davies_bouldin_score(coords, labels)
+            logger.info(f"Clustering event resulted in a Davies Bouldin Index of {self.score:.4f}")
 
     def _filter_noise(self, stay_points:pd.DataFrame, labels):
         # Adding cluster labels back to dataframe
