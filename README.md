@@ -80,11 +80,6 @@ logger = get_logger(__name__)
 user_id = "014"
 data_path = f"./app/data/user_{user_id}.pkl"
 
-# Initialize Reader / Preprocessor Objects
-detector = StayPointDetector()
-clusterer = StayPointClusterer()
-profiler = LocationProfiler()
-
 # Load Data
 with open(data_path, "rb") as f:
     try:
@@ -94,13 +89,19 @@ with open(data_path, "rb") as f:
     except FileNotFoundError as e:
         logger.debug(f"A FileNotFoundError occurred: {e}")
 
+# Detect Stay-Points
+detector = StayPointDetector()
 sps = detector.detect(pfs)
-locs = clusterer.cluster(sps)
-weights = np.array(locs["n_points"].values)
 
-# Profile User
+# Cluster Stay-Points
+clusterer = StayPointClusterer()
+locs = clusterer.cluster(sps)
+
+# Profile Locations
+profiler = LocationProfiler()
 profiles = profiler.profile(locs)
 
+# View results
 logger.info(f"Profiles DataFrame: \n{profiles}")
 ```
 ### Launch Dashboard
