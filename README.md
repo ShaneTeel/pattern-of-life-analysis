@@ -178,9 +178,9 @@ flowchart LR;
 ### Loyalty Metric
 `Loyalty` measures the stability of a user's relationship with a location over time. A user's `Loyalty` to a location is the product of the recency of the user's last visit and the number of visits to a location. Combining both recency (`Attenuation`) and visit count (`Amplification`) mitigates the following hypotheticals:
 
-- Scenario 1: A user once lived at 12345 Old Home Address and as such, Home Address has a high visit count. However, three-months ago the user moved to 67910 New Home Address. 90-days have passed since the user lived at Old Home. In this scenario, the system attenutates a user's `Loyalty` to Location A to avoid a high-visit count misrepresenting the significance of the location.
+- Scenario 1: A user once lived at 12345 Old Home Address and as such, Old Home Address has a high visit count. However, three-months ago the user moved to 67901 New Home Address. 90-days have passed since the user lived at Old Home Address. In this scenario, the system attenutates a user's `Loyalty` to Location the Old Home to avoid a high-visit count misrepresenting the significance of the location.
 
-- Scenario 2: A user recently started visiting a new gym in response to a promotion from the gym offering a 30-day trial. The user's visits are all fairly recent (past 30-days), which could indicate a new habit. In this scenario, a few recent visits to a new location does not indicate a pattern. A user must visit a location beyond a specific threshold before a location's `Loyalty` score is amplified.
+- Scenario 2: A user recently started visiting a new gym in response to a promotion from the gym offering a 30-day free trial. The user's visits are all fairly recent (past 30-days), which could indicate a new habit. In this scenario, a few recent visits to a new location does not indicate a pattern. A user must visit a location beyond a specific threshold before a location's `Loyalty` score is amplified.
 
 In short, neither the recency of a visit nor the number of visits should independently dictate the significance of a location. `Loyalty` aims to mitigate this issue. 
 
