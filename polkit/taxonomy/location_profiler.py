@@ -114,7 +114,6 @@ class LocationProfiler:
 
         # Per group variables
         last = locs["arrived"].max()
-        n_days = locs["date"].nunique()
         total_duration = locs["duration"].sum()
         total_visits = len(locs)
 
@@ -131,7 +130,7 @@ class LocationProfiler:
                 "Total Visits": len(group), 
                 "Visit Ratio": len(group) / total_visits,
                 "Regularity": compute_regularity(group["date"].tolist()),
-                "Loyalty": compute_loyalty(group["arrived"], n_days, last),
+                "Loyalty": compute_loyalty(group["arrived"], last),
                 "Spatial Focus": radius_of_gyration(group["sp_lat"].tolist(), group["sp_lon"].tolist())
             })
 

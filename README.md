@@ -176,31 +176,29 @@ flowchart LR;
 
 ## Methods
 ### Loyalty Metric
-`Loyalty` measures the stability of a user's relationship with a location over time. A user's Loyalty to a location correlates with the number of visits to that location and the recency of those visits, with the score nearing zero as a location "fades" from a user's short-term location memory (history). `Loyalty` is computed as the geometric mean of `Maturity`, `Saturation`, and `Attenuation` (described below).  
+`Loyalty` measures the stability of a user's relationship with a location over time. A user's `Loyalty` to a location is the product of the recency of the user's last visit and the number of visits to a location. Combining both recency (`Attenuation`) and visit count (`Amplification`) mitigates the following hypotheticals:
 
-$$\text{Loyalty} = ({Maturity}\times{Saturation}\times{Attenuation})^{\large\frac{1}{3}}$$
+- Scenario 1: A user once lived at 12345 Old Home Address and as such, Home Address has a high visit count. However, three-months ago the user moved to 67910 New Home Address. 90-days have passed since the user lived at Old Home. In this scenario, the system attenutates a user's `Loyalty` to Location A to avoid a high-visit count misrepresenting the significance of the location.
 
-**Maturity (Principle / Starting Value)**
+- Scenario 2: A user recently started visiting a new gym in response to a promotion from the gym offering a 30-day trial. The user's visits are all fairly recent (past 30-days), which could indicate a new habit. In this scenario, a few recent visits to a new location does not indicate a pattern. A user must visit a location beyond a specific threshold before a location's `Loyalty` score is amplified.
 
-`Maturity` is the ratio of days visited to the number of active collection days in the entire dataset. `Maturity` is the starting value and, despite it's name, does not actually reflect a location's maturity. The subsequent computations result in in the variable's maturation.
+In short, neither the recency of a visit nor the number of visits should independently dictate the significance of a location. `Loyalty` aims to mitigate this issue. 
 
-$$\text{Maturity} = \frac{NumDaysVisited}{NumCollectionDates}$$
+$$\text{Loyalty} = ({Amplification}\times{Attenuation})$$
 
-**Saturation (Learn-Rate)**
+**Amplification (Learn-Rate)**
 
-`Saturation` is an inverted exponential decay model with a default threshold value of 10 visits. If a user only visits a location 10 times, the locations maturity is attrited by half. 
+`Amplification` characterizes the number of times a user visited a location. The goal is to reward `Loyalty` if the location consists of a high number of visits and penalize if the visits are low.
 
-
-$$\text{Saturation} = 1 - e^{\large(\frac{\ln(0.5)}{\nu_{th}}\cdot\small{\sum{visits}})}$$
-$$\nu_{th} = {10}\text{ visits }\text{(default value)}$$
+$$\text{Amplification} = 1 - e^{\large(\frac{-\ln(2)}{\nu_{1/2}}\cdot\small{\nu})}$$
+$$\nu_{1/2} = {10}\text{ visits }\text{(fixed value)}$$
 
 **Attenuation (Forget-Rate)**
-
-`Attenuation` is an exponential decay model with a default half-life of 30 days. If a user has not visited a location in 30-days, the location's maturity attrits by half.
+`Attenuation` is the counter-balance. It characterizes the amount of time since a user's last visit to a location. The goal is to penalize a location if it is an "old haunt" that a user no longer visits.
 
 $$\text{Attenuation} = e^{\large(\frac{\ln(0.5)}{t_{1/2}}\cdot{\Delta{t}})}$$
 
-$$t_{1/2} = {30}\text{ days }\text{(default value)}$$
+$$t_{1/2} = {30}\text{ days }\text{(fixed value)}$$
 
 ### Classification System
 

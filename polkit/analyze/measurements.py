@@ -171,17 +171,14 @@ def compute_regularity(dwell_dates:pd.Series):
     else:
         return 0.0
     
-def compute_loyalty(arrival:pd.Series[pd.Timestamp], active_days:int, collection_end:pd.Timestamp, attenuation_thresh:int=30, saturation_thresh:int=10):
+def compute_loyalty(arrival:pd.Series[pd.Timestamp], collection_end:pd.Timestamp):
     '''
     Description
     -----------
     Determine a user's loyalty regarding a specific location.
-    Computes M (maturity), S (saturation), and A (attenuation) as intermediate steps and returns the geometric mean of all three
-    - M (maturity): Characterizes the temporal length of a users relationship with a location.
-    If M is high, then the user's visits to the location has persisted across the collection range.
-    - S (saturation): Characterizes the number of times a user visited a location. 
-    The goal is to reward M if the location consists of a high number of visits.
-    - A (attenuation), which characterizes the amount of time since last visit. 
+    - Amplification (AMP / Learn-Rate): Characterizes the number of times a user visited a location. 
+    The goal is to reward Loyalty if the location consists of a high number of visits.
+    - Attenuation (ATT / Forget-Rate), which characterizes the amount of time since last visit. 
     The goal is to penalize a location if it is an "old haunt" that a user no longer visits.
     
     Parameters
@@ -191,33 +188,19 @@ def compute_loyalty(arrival:pd.Series[pd.Timestamp], active_days:int, collection
     collection_end : pd.Timestamp
         A pd.Timestamp object representing the last day of the collection window 
         for the entire dataset.
-    active_days : int
-        The number of active days in the collection period
-    saturation_thresh : int, default=10
-        The number of visits a location needs to achieve a doubling affect on M (maturity)
-
     Returns
     -------
     loyalty : float
-        ```
-        (M * S * A)**(1/3)
-        ```
     '''
-    # Compute M (maturity, or how long a users relationship with a location persists)
-    dates = arrival.dt.date
-    visit_days = dates.nunique()
-    M = visit_days / active_days if active_days != 0 else 0.0
 
-    # Compute S (saturation, or how many times a user visited a location) if n_visits is below thresh
+    # Compute Amplification (AMP), or how many times a user visited a location; if n_visits is below thresh
     n_visits = len(arrival)
-    learn_rate = np.log(0.5) / saturation_thresh
-    S = 1 - np.exp(learn_rate * n_visits)
-    M *= S
+    learn_rate = -(np.log(2) / 10)
+    AMP = 1 - np.exp(learn_rate * n_visits)
 
-    # Compute A (attenuation, or how long has it been since the last visit) if time delta is below thresh
+    # Compute Attenuation (ATT) or how long has it been since the last visit; if time delta is below thresh
     T_d_last_visit = (collection_end - arrival.max()).days
-    forget_rate = np.log(0.5) / attenuation_thresh
-    A = np.exp(forget_rate * T_d_last_visit)
-    M *= A
+    forget_rate = np.log(0.5) / 30
+    ATT = np.exp(forget_rate * T_d_last_visit)
 
-    return M**(1/3)
+    return AMP * ATT
