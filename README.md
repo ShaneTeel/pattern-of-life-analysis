@@ -20,9 +20,11 @@ An individual-level analytics framework designed to expedite key steps in patter
 ## Demo
 [Launch Demo](https://pattern-of-life-analysis.streamlit.app)
 
-### Example Output (Taxonomy) 
+### Example Output (Integrity) 
+![Integrity](./media/integrity.png)
+
+### Example Output (Taxonomy (Partial View))
 ![Global View](./media/tax-global-view.png)
-![Local View](./media/tax-local-view.png)
 
 [Return to TOC](#table-of-contents)
 
@@ -175,6 +177,8 @@ flowchart LR;
 [Return to TOC](#table-of-contents)
 
 ## Methods
+![Profile Chart](./media/profile-chart.png)
+
 ### Loyalty Index
 
 `Loyalty` measures the stability of a user's relationship with a location over time. 
