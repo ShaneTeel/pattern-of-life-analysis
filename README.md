@@ -183,7 +183,7 @@ flowchart LR;
 
 `Loyalty` measures the stability of a user's relationship with a location over time. 
 
-$$\text{Loyalty}\left(\Delta{d}, h, n\right)=\frac{3}{\Large\frac{1}{D_{rec}\left(\Delta d\right)}+\frac{1}{S_{\text{dur, hr}}\left(h\right)}+\frac{1}{S_{\text{vis}}\left(v\right)}}$$
+$$\text{Loyalty}=\frac{3}{\Large\frac{1}{D_{rec}}+\frac{1}{S_{\text{dur, hr}}}+\frac{1}{S_{\text{vis}}}}$$
 
 `Loyalty` addresses the following hypotheticals:
 
