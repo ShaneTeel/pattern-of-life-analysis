@@ -4,7 +4,7 @@ from datetime import time, timedelta
 def show_location_profiling():
     st.subheader("Location Profiling Configuration")
 
-    with st.container(border=True):
+    with st.container(border=True, width="stretch"):
         st.markdown("<b><u>Sleep Location Options</b></u>", unsafe_allow_html=True)
         sleep1, sleep2 = st.columns(2, width="stretch")
         with sleep1:

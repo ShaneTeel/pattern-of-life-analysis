@@ -26,9 +26,8 @@ def run_process(det_configs, cluster_configs, sleep_configs, work_configs):
     profiles = profiler.profile(locs)
     st.session_state["profiles"] = profiles
 
-    diamond_data, digraph_data = profiler.format_profiles_for_charts()
-    st.session_state["diamond_data"] = diamond_data
-    st.session_state["digraph_data"] = digraph_data
+    chart_data = profiler.format_profiles_for_charts()
+    st.session_state["chart_data"] = chart_data
 
     home_id = profiler.get_likely_home()
     st.session_state["likely_home"] = home_id
@@ -40,10 +39,10 @@ def run_process(det_configs, cluster_configs, sleep_configs, work_configs):
     H = 1 - normalized_entropy(profiles["Total Visits"])
 
     locations = len(profiles)
-    anchors = len(profiles[profiles["Label"] == "Anchor"])
-    habits = len(profiles[profiles["Label"] == "Habit"])
-    recurring = len(profiles[profiles["Label"] == "Recurring"])
-    transient = len(profiles[profiles["Label"] == "Transient"])
+    anchors = len(profiles[profiles["Loyalty Label"] == "Anchor"])
+    habits = len(profiles[profiles["Loyalty Label"] == "Habit"])
+    recurring = len(profiles[profiles["Loyalty Label"] == "Recurring"])
+    transient = len(profiles[profiles["Loyalty Label"] == "Transient"])
     homes = len(profiles[profiles["Candidate Home"] == True])
     works = len(profiles[profiles["Candidate Work"] == True])
 

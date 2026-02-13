@@ -3,6 +3,7 @@ import numpy as np
 
 from polkit.taxonomy import *
 from polkit.strategy import *
+from polkit.visualize import ChartMaker
 from polkit.utils import get_logger, setup_logging, train_test_split
 
 setup_logging(
@@ -42,6 +43,13 @@ if __name__=="__main__":
     # Profile User
     profiled_df = profiler.profile(locs)
 
+    chart_data = profiler.format_profiles_for_charts()
+    chart_maker = ChartMaker()
+
+    fig = chart_maker.create_location_profile_chart(chart_data)
+
+    fig.show()
+    
     # Get model inputs
     ## States
     counts = locs["loc_id"].value_counts()

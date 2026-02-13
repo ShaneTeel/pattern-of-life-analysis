@@ -8,9 +8,13 @@ import calplot
 
 class ChartMaker:
 
-    def __init__(self):
-
-        pass
+    _LABEL_COLORS = {
+        "Anchor": "gold",
+        "Habit": "steelblue",
+        "Recurring": "mediumseagreen",
+        "Transient": "salmon",
+        "Unknown": "gray"
+    }
 
     def create_gaps_gantt(self, gaps_df:pd.DataFrame):
         gap_fig = px.timeline(gaps_df, x_start="start", x_end="end", y="Gap ID", color="duration_hours", title="All Gaps (>24 hours)")
@@ -66,34 +70,135 @@ class ChartMaker:
         return bar_fig
     
     def create_location_profile_chart(self, data:pd.DataFrame):
+        col_names = [["Visit Count", "Recency", "Depth"], ["Arrival Consistency", "Dwell Consistency", "Gap Consistency"], ["Spatial Focus"]]
+        gauge_max = data[col_names[2][0]].values.max()
 
-        diamond_fig = px.line_polar(
-            data_frame=data,
-            r="Score",
-            theta="Metric",
-            title="Profile Charts",
-            animation_frame="Location ID",
-            template="plotly_dark",
-            line_close=True,
-            range_r=[0, 1]
+
+        fig = make_subplots(
+            rows=2,
+            cols=2,
+            row_heights=[0.7, 0.3],
+            specs=[
+                [{"type": "polar"}, {"type": "polar"}],
+                [{"type": "indicator", "colspan": 2}, None]
+            ]
         )
 
-        for i, frame in enumerate(diamond_fig.frames):
-            frame.layout.title.text = data.loc[i, "Hover"]
+        fig.add_trace(
+            go.Scatterpolar(
+                r=data.loc[0, col_names[0]].values,
+                theta=col_names[0],
+                fill="toself",
+                name="Loyalty",
+                mode="none"
+            ),
+            row=1, col=1
+        )
 
-        diamond_fig.for_each_annotation(lambda a: a.update(text=a.text.split("=")[-1]))
-        diamond_fig.update_traces(fill="toself")
+        fig.add_trace(
+            go.Scatterpolar(
+                r=data.loc[0, col_names[1]].values,
+                theta=col_names[1],
+                fill="toself",
+                name="Predictability",
+                mode="none"
+            ),
+            row=1, col=2
+        )
 
-        return diamond_fig
+        fig.add_trace(
+            go.Indicator(
+                value=data.loc[0, col_names[2][0]],
+                mode="gauge",
+                title={"text": "Spatial Focus"},
+                gauge={"axis": {"range": [0, gauge_max]}}
+            ),
+            row=2, col=1
+        )
+
+        frames = []
+        steps = []
+
+        for _, loc in data.iterrows():
+            loc_id = str(loc["Location ID"])
+            frames.append(
+                go.Frame(
+                    data=[
+                        go.Scatterpolar(
+                            r=loc[col_names[0]].values,
+                            theta=col_names[0],
+                            fill="toself",
+                            mode="none"
+                        ),
+                        go.Scatterpolar(
+                            r=loc[col_names[1]].values,
+                            theta=col_names[1],
+                            fill="toself",
+                            mode="none"
+                        ),
+                        go.Indicator(
+                            value=loc[col_names[2][0]],
+                            mode="gauge",
+                            gauge={"axis": {"range": [0, gauge_max]}}
+                        )
+                    ],
+                    name=loc_id,
+                    layout={
+                        "title": 
+                        {
+                            "text": loc["Hover"],
+                            "x": 0.46,
+                            "xanchor": "center"
+                        }
+                    }
+                )
+            )
+            steps.append(
+                {
+                    "method": "animate",
+                    "args": [
+                        [loc_id], 
+                        {
+                            "frame": {"duration": 0, "redraw": True},
+                            "mode": "immediate",
+                            "transition": {"duration": 0}
+                        }
+                    ],
+                    "label": loc["Location ID"]
+                }
+            )
+
+        fig.frames = frames
+
+        fig.for_each_annotation(lambda a: a.update(text=a.text.split("=")[-1]))
+
+        sliders = [
+            {
+                "active": 0,
+                "currentvalue": {"prefix": "Location: "},
+                "pad": {"t": 50},
+                "steps": steps
+            }
+        ]
+
+        fig.update_layout(
+            sliders=sliders,
+            polar=
+            {
+                "angularaxis": {"rotation": 90},
+                "radialaxis": {"range": [0, data[col_names[0]].values.max()]}
+            },
+            polar2=
+            {
+                "angularaxis": {"rotation": 90},
+                "radialaxis": {"range": [0, data[col_names[1]].values.max()]}
+            },
+            template="plotly_dark"
+        )
+
+        return fig
     
     def create_stability_gantt(self, df:pd.DataFrame):
-        label_colors = {
-            "Anchor": "gold",
-            "Habit": "steelblue",
-            "Recurring": "mediumseagreen",
-            "Transient": "salmon",
-            "Unknown": "gray"
-        }
 
         fig = go.Figure()
 
@@ -104,7 +209,7 @@ class ChartMaker:
                 mode="lines+markers",
                 name="Temporal Stability",
                 hoverinfo="all",
-                marker=dict(color=label_colors[loc["Label"]], symbol="diamond"),
+                marker=dict(color=self._LABEL_COLORS[loc["Loyalty Label"]], symbol="diamond"),
                 line=dict(width=3)
             ))
 

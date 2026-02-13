@@ -11,9 +11,9 @@ It then generates a behavioral profile for each discrete location based on visit
 To get started, adjust the configuration options and select the corresponding action button below (`Process`). 
 """)
     with st.sidebar:
+        process = st.button("Process")
         det_configs, cluster_configs = show_location_mining()
         sleep_configs, work_configs = show_location_profiling()
-        process = st.button("Process")
 
     if process:
         run_reset()

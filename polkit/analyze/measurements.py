@@ -139,7 +139,7 @@ def normalized_entropy(weights, n_bins:int=None):
     
     total = sum(weights)
 
-    probas = [count / total for count in weights]
+    probas = [count / total for count in weights if total > 0]
 
     shannon = -sum(p * np.log2(p) for p in probas if p > 0)
     
@@ -151,56 +151,23 @@ def normalized_entropy(weights, n_bins:int=None):
     max_entropy = np.log2(N)
     return shannon / max_entropy
 
-def compute_regularity(dwell_dates:pd.Series):
-
-    if len(dwell_dates) < 5:
+def normalized_consistency(X:pd.Series | list):
+    if X is None or len(X) < 2:
         return 0.0
-    
-    dwells = sorted(dwell_dates)
 
-    gaps = [
-        (dwells[i+1] - dwells[i]).days for i in range(len(dwells) - 1)
-    ]
+    mean_X = np.mean(X)
+    range_X = np.max(X) - np.min(X)
 
-    mean_gap = np.mean(gaps)
-    std_gap = np.std(gaps)
 
-    if mean_gap > 0:
-        cv = std_gap / mean_gap
-        return 1 / (cv + 1)
+    if mean_X > 0:
+        sensitive_CV = range_X / mean_X
+        return 1 / (sensitive_CV + 1)
     else:
         return 0.0
     
-def compute_loyalty(arrival:pd.Series[pd.Timestamp], collection_end:pd.Timestamp):
-    '''
-    Description
-    -----------
-    Determine a user's loyalty regarding a specific location.
-    - Amplification (AMP / Learn-Rate): Characterizes the number of times a user visited a location. 
-    The goal is to reward Loyalty if the location consists of a high number of visits.
-    - Attenuation (ATT / Forget-Rate), which characterizes the amount of time since last visit. 
-    The goal is to penalize a location if it is an "old haunt" that a user no longer visits.
-    
-    Parameters
-    ----------
-    arrival : pd.Series
-        The datetime objects for each visit to a location
-    collection_end : pd.Timestamp
-        A pd.Timestamp object representing the last day of the collection window 
-        for the entire dataset.
-    Returns
-    -------
-    loyalty : float
-    '''
+def exponential_saturation(X:int, half_life:int):
+    return 1 - exponential_decay(X, half_life)
 
-    # Compute Amplification (AMP), or how many times a user visited a location; if n_visits is below thresh
-    n_visits = len(arrival)
-    learn_rate = -(np.log(2) / 10)
-    AMP = 1 - np.exp(learn_rate * n_visits)
-
-    # Compute Attenuation (ATT) or how long has it been since the last visit; if time delta is below thresh
-    T_d_last_visit = (collection_end - arrival.max()).days
-    forget_rate = np.log(0.5) / 30
-    ATT = np.exp(forget_rate * T_d_last_visit)
-
-    return AMP * ATT
+def exponential_decay(X:int, half_life:int):
+    decay_rate = (np.log(0.5) / half_life)
+    return np.exp(decay_rate * X)

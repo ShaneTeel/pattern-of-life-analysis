@@ -175,32 +175,41 @@ flowchart LR;
 [Return to TOC](#table-of-contents)
 
 ## Methods
-### Loyalty Metric
-`Loyalty` measures the stability of a user's relationship with a location over time. A user's `Loyalty` to a location is the product of the recency of the user's last visit and the number of visits to a location. Combining both recency (`Attenuation`) and visit count (`Amplification`) mitigates the following hypotheticals:
+### Loyalty Index
+
+`Loyalty` measures the stability of a user's relationship with a location over time. 
+
+$$\text{Loyalty}\left(\Delta{d}, h, n\right)=\frac{3}{\Large\frac{1}{D_{rec}\left(\Delta d\right)}+\frac{1}{S_{\text{dur, hr}}\left(h\right)}+\frac{1}{S_{\text{vis}}\left(v\right)}}$$
+
+`Loyalty` addresses the following hypotheticals:
 
 - Scenario 1: A user once lived at 12345 Old Home Address and as such, Old Home Address has a high visit count. However, three-months ago the user moved to 67901 New Home Address. 90-days have passed since the user lived at Old Home Address. In this scenario, the system attenutates a user's `Loyalty` to Location the Old Home to avoid a high-visit count misrepresenting the significance of the location.
 
 - Scenario 2: A user recently started visiting a new gym in response to a promotion from the gym offering a 30-day free trial. The user's visits are all fairly recent (past 30-days), which could indicate a new habit. In this scenario, a few recent visits to a new location does not indicate a pattern. A user must visit a location beyond a specific threshold before a location's `Loyalty` score is amplified.
 
-In short, neither the recency of a visit nor the number of visits should independently dictate the significance of a location. `Loyalty` aims to mitigate this issue. 
+In short, neither the recency, nor the count, nor the total dwell should independently dictate the significance of a location. `Loyalty` aims to mitigate this issue.
 
-$$\text{Loyalty} = ({Amplification}\times{Attenuation})$$
+A user's `Loyalty` to a location is influenced by three factors:
 
-**Amplification (Learn-Rate)**
+1. the number of days since the user's last visit (`Recency`)
 
-`Amplification` characterizes the number of times a user visited a location. The goal is to reward `Loyalty` if the location consists of a high number of visits and penalize if the visits are low.
+$$D_{rec}(\Delta d) = e^{\large(\frac{\ln(0.5)}{\Delta{d_{1/2}}}\cdot{\normalsize\Delta{d}})}$$
 
-$$\text{Amplification} = 1 - e^{\large(\frac{-\ln(2)}{\nu_{1/2}}\cdot\small{\nu})}$$
-$$\nu_{1/2} = {10}\text{ visits }\text{(fixed value)}$$
+$$\Delta{d_{1/2}} = {30}\text{ days }\text{(default value)}$$
 
-**Attenuation (Forget-Rate)**
-`Attenuation` is the counter-balance. It characterizes the amount of time since a user's last visit to a location. The goal is to penalize a location if it is an "old haunt" that a user no longer visits.
+2. the cumulative amount of time (in hours) spent at a location across all visits (`Depth`)
 
-$$\text{Attenuation} = e^{\large(\frac{\ln(0.5)}{t_{1/2}}\cdot{\Delta{t}})}$$
+$$S_{dur}(h) = 1 - e^{\large(\frac{-\ln(2)}{h_{1/2}}\cdot{h})}$$
 
-$$t_{1/2} = {30}\text{ days }\text{(fixed value)}$$
+$$h_{1/2} = {4}\text{ hours }\text{(default value)}$$
 
-### Classification System
+3. the total number of visits to a location (`Visit Count`)
+
+$$S_{vis}(v) = 1 - e^{\large(\frac{-\ln(2)}{v_{1/2}}\cdot{v})}$$
+
+$$v_{1/2} = {10}\text{ visits }\text{(default value)}$$
+
+### Loyalty Label
 
 **Anchor (top rating)** - The location represents the center of gravity for a User's movements. Home is typically an anchor. However, data quality will ultimately affect classification.
 
@@ -209,6 +218,16 @@ $$t_{1/2} = {30}\text{ days }\text{(fixed value)}$$
 **Recurring (3rd best)** - User visits the location frequently, but the visits lack a routine (a grocery store, the movies, etc.). It, like all the other two above, is a destination, but it's not one with an established routine (i.e., why it's not a habit).
 
 **Transient (worst)** - Either not a destination (i.e., a way-point) or a location that lacks enough history to be qualified for any other class (Transient == Outlier).
+
+### Predictability Index
+`Predictability` is a measure of consistency across three vectors:
+1. Arrival hour
+2. Dwell Time (in hours)
+3. Gaps (in days) between visits
+
+The formula for measuring consistency (below) is normalized to a range of [0, 1] with 1 == absolute consistency and 0 == no consistency. The function returns 0 for a specific vector if the location has less that two visits or there are less than two measured gaps between visits.
+
+$$P(x) = {\frac{1}{\large\frac{\max({x}) - \min({x})}{\mu({x})}}}$$
 
 [Return to TOC](#table-of-contents)
 

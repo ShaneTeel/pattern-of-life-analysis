@@ -32,10 +32,8 @@ if "profiles" not in st.session_state:
     st.session_state["profiles"] = None
 if "profile_metrics" not in st.session_state:
     st.session_state["profile_metrics"] = None
-if "diamond_data" not in st.session_state:
-    st.session_state["diamond_data"] = None
-if "digraph_data" not in st.session_state:
-    st.session_state["digraph_data"] = None
+if "chart_data" not in st.session_state:
+    st.session_state["chart_data"] = None
 if "likely_home" not in st.session_state:
     st.session_state["likely_home"] = None
 
@@ -57,7 +55,7 @@ if "digraph_fig" not in st.session_state:
 if "layout_style" not in st.session_state:
     st.session_state["layout_style"] = None
 
-st.set_page_config(layout="wide")
+st.set_page_config(layout="wide", initial_sidebar_state="expanded")
 
 st.title("Pattern-of-Life Analysis Dashboard")
 
@@ -98,8 +96,7 @@ if user != st.session_state["user_id"]:
     st.session_state["locations"] = None
     st.session_state["profiles"] = None
     st.session_state["profile_metrics"] = None
-    st.session_state["diamond_data"] = None
-    st.session_state["digraph_data"] = None
+    st.session_state["chart_data"] = None
     st.session_state["likely_home"] = None
 
     logger.debug(f"Taxonomy tab session-state values cleared / re-assigned `None`.")

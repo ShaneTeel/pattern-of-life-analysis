@@ -49,12 +49,21 @@ def show_global_view():
         else:
             if st.session_state["digraph_fig"] is None or st.session_state["layout_style"] != layout_style:
                 network_builder = NetworkBuilder()
-                digraph_data = st.session_state["digraph_data"]
+                chart_data = st.session_state["chart_data"]
                 matrix = st.session_state["matrix"]
                 matrix_key = st.session_state["matrix_key"]
-                fig = network_builder.build_network(layout_style, matrix, matrix_key, digraph_data)
+                fig = network_builder.build_network(layout_style, matrix, matrix_key, chart_data)
                 st.session_state["digraph_fig"] = fig
                 st.session_state["layout_style"] = layout_style
 
             fig = st.session_state["digraph_fig"]
             st.plotly_chart(fig, width="stretch", key="digraph_chart")
+    
+    with st.container(border=True, width="stretch"):
+        if st.session_state["chart_data"] is None:
+            st.info("A Location's Stability will become available after performing Location Profiling (i.e., `Process`)")
+        else:
+            chart_data = st.session_state["chart_data"]
+            chart_maker = st.session_state["chart_maker"]
+            stab_gantt = chart_maker.create_stability_gantt(chart_data)
+            st.plotly_chart(stab_gantt, width="stretch", key="stability_gantt")

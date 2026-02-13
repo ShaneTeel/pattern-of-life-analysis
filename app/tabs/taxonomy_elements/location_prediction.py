@@ -60,12 +60,6 @@ def train_eval_markov_model():
             st.session_state["matrix"] = matrix
             st.session_state["matrix_key"] = key
 
-            if st.session_state["likely_home"] is not None:
-                start = st.session_state["likely_home"]
-
-            else:
-                profiles = st.session_state["profiles"]
-                start = profiles.loc[profiles["Routine Index"].idxmax(), "Location ID"]
-            
+            start = st.session_state["likely_home"]
             top_k_pred = model.predict_next_k(start, k=3)
             st.session_state["top_k_pred"] = top_k_pred

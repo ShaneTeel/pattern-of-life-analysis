@@ -2,9 +2,11 @@ from __future__ import annotations
 
 import numpy as np
 import pandas as pd
+from scipy.stats import hmean
+from sklearn.preprocessing import MinMaxScaler
 from typing import Literal
 
-from polkit.analyze import radius_of_gyration, compute_regularity, compute_loyalty
+from polkit.analyze import radius_of_gyration, normalized_consistency, exponential_decay, exponential_saturation
 from .anchor_points import BedDownIdentifier, WorkIdentifier
 from polkit.utils import get_logger
 
@@ -24,12 +26,12 @@ class LocationProfiler:
 
     _REQUIRED_COLS = ["loc_id", "arrived", "departed", "cluster_lat", "cluster_lon"]
 
-    _COL_ORDER = ["Location ID", "Lat", "Lon", "Spatial Focus", 
-                  "Total Dwell", "Dwell Ratio", 
-                  "First Seen", "Last Seen", "Total Days Seen", 
-                  "Total Visits", "Visit Ratio", 
-                  "Loyalty", "Regularity",
-                  "Routine Index", "Label"]
+    _COL_ORDER = ["Location ID", 
+                  "Lat", "Lon", "Spatial Focus", 
+                  "Total Dwell", "First Seen", "Last Seen", "Total Visits", 
+                  "Arrival Consistency", "Dwell Consistency", "Gap Consistency",
+                  "Recency", "Depth", "Visit Count",
+                  "Loyalty Index", "Predictability Index", "Loyalty Label"]
 
     _OPTIONS = ["Transient", "Recurring", "Habit", "Anchor"]
 
@@ -52,6 +54,8 @@ class LocationProfiler:
 
         self.work = WorkIdentifier(work_window=work_window, min_duration=min_work, work_days=work_days, coverage=work_coverage)
         self.work_df = None
+        
+        self.scaler = MinMaxScaler()
 
         logger.debug("LocationProfiler initialized")
 
@@ -111,35 +115,38 @@ class LocationProfiler:
         # Pre-Profiling Optimization 
         locs["hours"] = locs["arrived"].dt.hour
         locs["date"] = locs["arrived"].dt.date
-
-        # Per group variables
         last = locs["arrived"].max()
-        total_duration = locs["duration"].sum()
-        total_visits = len(locs)
-
         
         def profile_group(group:pd.Series):
             return pd.Series({
                 "Lat": group["cluster_lat"].iloc[0],
                 "Lon": group["cluster_lon"].iloc[0],
+                "Spatial Focus": radius_of_gyration(group["sp_lat"].tolist(), group["sp_lon"].tolist()),
+
                 "Total Dwell": group["duration"].sum(),
-                "Dwell Ratio": group["duration"].sum() / total_duration,
+                "Avg Dwell": group["duration"].mean(), 
+                
                 "First Seen": group["arrived"].min(),
                 "Last Seen": group["arrived"].max(),
-                "Total Days Seen": group["arrived"].nunique(),
                 "Total Visits": len(group), 
-                "Visit Ratio": len(group) / total_visits,
-                "Regularity": compute_regularity(group["date"].tolist()),
-                "Loyalty": compute_loyalty(group["arrived"], last),
-                "Spatial Focus": radius_of_gyration(group["sp_lat"].tolist(), group["sp_lon"].tolist())
+                
+                "Arrival Consistency": normalized_consistency(group["hours"]),
+                "Dwell Consistency": normalized_consistency(group["duration"]),
+                "Gap Consistency": normalized_consistency(self._find_gaps(group["arrived"])),
+
+                "Recency": exponential_decay((last - group["arrived"].max()).days, 30),
+                "Depth": exponential_saturation(group["duration"].sum(), 4),
+                "Visit Count": exponential_saturation(len(group["arrived"]), 10),
             })
 
         profile = locs.groupby("loc_id").apply(profile_group, include_groups=False).reset_index(names="Location ID")
     
-        # Aggregate metrics to compute "habit" score
-        profile["Routine Index"] = profile[["Regularity", "Loyalty", "Visit Ratio", "Dwell Ratio"]].mean(axis=1)
+        # Take harmonic mean of "Loyalty" metrics; assign Label
+        profile["Loyalty Index"] = profile[["Recency", "Depth", "Visit Count"]].apply(hmean, axis=1)
+        profile["Loyalty Label"] = self._assign_label(profile["Loyalty Index"])
 
-        profile["Label"] = self._assign_label(profile["Routine Index"])
+        # Determine which locations are assessed for "Predictiability"
+        profile["Predictability Index"] = profile[["Arrival Consistency", "Dwell Consistency", "Gap Consistency"]].mean(axis=1)
 
         return profile[self._COL_ORDER].sort_values(by="Location ID")
     
@@ -173,21 +180,16 @@ class LocationProfiler:
         profile_df = self.profile_df.copy()
         profile_df["Hover"] = profile_df.apply(lambda x: f"""
 <b>Location ID</b>: {int(x["Location ID"])}<br>
-<b>Routine Index</b>: {x["Routine Index"]:.2f}<br>
-<b>Classification</b>: {x["Label"]}<br>
-<b>Candidate Home</b>: {x["Candidate Home"]}<br>
-<b>Candidate Work</b>: {x["Candidate Work"]}<br>
+<b>Spatial Focus</b>: {x["Spatial Focus"]:.2f} meters<br>
+<b>Loyalty</b>: {x["Loyalty Index"]:.2%}<br>
+<b>Predictability</b>: {x["Predictability Index"]:.2%}<br>
+<b>Classification</b>: {x["Loyalty Label"]}<br>
+<b>Home / Work Candidacy</b>: {"Home, Work" if x["Candidate Home"] and x["Candidate Work"] else "Home" if x["Candidate Home"] else "Work" if x["Candidate Work"] else ""}<br>
 """, axis=1)
-    
-        df_short = profile_df[["Location ID", "Hover", "Visit Ratio", "Loyalty", "Dwell Ratio", "Regularity"]]
-        diamond_data = df_short.melt(
-            id_vars=["Hover", "Location ID"],
-            value_vars=df_short.columns.tolist(),
-            var_name="Metric",
-            value_name="Score"
-        )
+                
+        profile_df["Spatial Focus"] = 1 - self.scaler.fit_transform(profile_df[["Spatial Focus"]])
 
-        return diamond_data, profile_df
+        return profile_df
     
     def get_anchor_point_data(self):
         if self.sleep_df is None or self.work_df is None:
@@ -197,7 +199,19 @@ class LocationProfiler:
 
     def get_likely_home(self):
         if self.sleep_df is None:
-            return None
+            return self.profile_df.loc[self.profile_df["Loyalty Index"].idxmax(), "Location_ID"]
         
         home_subset = self.profile_df[self.profile_df["Candidate Home"] == True]
-        return home_subset.loc[home_subset["Routine Index"].idxmax(), "Location ID"]
+        return home_subset.loc[home_subset["Loyalty Index"].idxmax(), "Location ID"]
+    
+    def _find_gaps(self, visit_dates:pd.Series):
+
+        if len(visit_dates) < 5:
+            return [0.0]
+    
+        visits = sorted(visit_dates)
+
+        gaps = [
+            (visits[i+1] - visits[i]).days for i in range(len(visits) - 1)
+        ]
+        return gaps
