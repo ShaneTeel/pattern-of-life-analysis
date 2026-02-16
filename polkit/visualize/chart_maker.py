@@ -25,7 +25,7 @@ class ChartMaker:
         dt_series = pfs["datetime"].dt.normalize().dt.tz_localize(None).value_counts().sort_index()
         calplot_fig, _ = calplot.calplot(
             data=dt_series, 
-            suptitle=f"User {user_id}'s Activty by Date",
+            suptitle=f"User {user_id}'s Activity by Date",
             yearlabel_kws={"fontname": "sans-serif"}
         )
         return calplot_fig

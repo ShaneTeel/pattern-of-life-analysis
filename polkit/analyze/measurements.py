@@ -158,7 +158,7 @@ def normalized_consistency(X:pd.Series | list):
     mean_X = np.mean(X)
     range_X = np.max(X) - np.min(X)
 
-
+    
     if mean_X > 0:
         sensitive_CV = range_X / mean_X
         return 1 / (sensitive_CV + 1)
