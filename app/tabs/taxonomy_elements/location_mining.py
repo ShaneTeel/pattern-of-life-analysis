@@ -57,7 +57,7 @@ def show_location_mining():
                 min_value=0.1, 
                 max_value=1.0, 
                 value=0.2,
-                step=0.1,
+                step=0.05,
                 help=eps_help
             )
         
