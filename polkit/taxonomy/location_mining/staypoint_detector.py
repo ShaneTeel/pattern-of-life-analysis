@@ -78,14 +78,14 @@ class StayPointDetector:
 
     def _create_staypoint(self, records:pd.DataFrame, duration:float):
         return {
-            "user_id": records.iloc[0]["uid"],
-            "arrived": records.iloc[0]["datetime"],
-            "departed": records.iloc[-1]["datetime"],
+            "user_id": records["uid"].iloc[0],
+            "arrived": records["datetime"].iloc[0],
+            "departed": records["datetime"].iloc[-1],
             "lat": records["lat"].mean(),
             "lon": records["lon"].mean(),
             "duration": duration / 60,
             "n_points": len(records)
         }
     
-    def _time_delta(self, td: pd.Timedelta):
-        return td / np.timedelta64(60, "s")
+    def _time_delta(self, td: np.timedelta64):
+        return td / np.timedelta64(1, "m")

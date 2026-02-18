@@ -40,7 +40,7 @@ def run_process(det_configs, cluster_configs, sleep_configs, work_configs):
 
     locations = len(profiles)
     anchors = len(profiles[profiles["Loyalty Label"] == "Anchor"])
-    habits = len(profiles[profiles["Loyalty Label"] == "Habit"])
+    persistent = len(profiles[profiles["Loyalty Label"] == "Persistent"])
     recurring = len(profiles[profiles["Loyalty Label"] == "Recurring"])
     transient = len(profiles[profiles["Loyalty Label"] == "Transient"])
     homes = len(profiles[profiles["Candidate Home"] == True])
@@ -53,7 +53,7 @@ def run_process(det_configs, cluster_configs, sleep_configs, work_configs):
         "Confidence": "HIGH" if H > 0.66 else "MODERATE" if H > 0.33 else "LOW",
         "Locations": locations,
         "Anchors": anchors,
-        "Habits": habits,
+        "Persistent": persistent,
         "Recurring": recurring,
         "Transient": transient,
         "Homes": homes,

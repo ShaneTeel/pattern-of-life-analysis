@@ -10,7 +10,7 @@ class ChartMaker:
 
     _LABEL_COLORS = {
         "Anchor": "gold",
-        "Habit": "steelblue",
+        "Persistent": "steelblue",
         "Recurring": "mediumseagreen",
         "Transient": "salmon",
         "Unknown": "gray"

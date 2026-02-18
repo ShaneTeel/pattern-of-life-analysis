@@ -17,10 +17,9 @@ class LocationProfiler:
     Classifies locations by a routine score that is computed based on visit ratio, dwell ratio, predictability, and regularity.
     
     Classification system assigns:
-    - "Routine": Core locations; serve as the backbone of the User's pattern
-    - "Staple": Lifestyle habits; more flexible than "Routine", 
-    but still lacks the rigid adherence to a pattern to be classified as "Routine"
-    - "Periodic": Secondary interests; low-density
+    - "Anchor": Core locations; serve as the backbone of the User's pattern
+    - "Persistent": Not a hub, but location persists throughout the data 
+    - "Recurring": Secondary interests; low-density
     - "Transient": Environmental noise, atypical behavior, one-off visits, or "stops along the way" to more established locations
     '''
 
@@ -33,7 +32,7 @@ class LocationProfiler:
                   "Recency", "Depth", "Visit Count",
                   "Loyalty Index", "Predictability Index", "Loyalty Label"]
 
-    _OPTIONS = ["Transient", "Recurring", "Habit", "Anchor"]
+    _OPTIONS = ["Transient", "Recurring", "Persistent", "Anchor"]
 
     def __init__(
             self, 

@@ -88,8 +88,8 @@ class MapMaker:
             Id: {row["sp_id"]}<br>
             Arrived: {row["arrived"]}<br>
             Departed: {row["departed"]}<br>
-            Duration (Minutes): {row["duration"]:.2f}<br>
-            # Visits: {row["n_points"]}
+            Duration (Hours): {row["duration"]:.2f}<br>
+            # Traces: {row["n_points"]}
             """
 
             folium.CircleMarker(

@@ -14,7 +14,7 @@ def show_analytic_summary():
 
                 analytic_summary = f"""User {user_id}'s location history, as defined by the collection period, consists of {profile_metrics["Locations"]} total unique locations with the following distribution by classification:
 - {profile_metrics["Anchors"]} Anchor Locations
-- {profile_metrics["Habits"]} Habit Locations
+- {profile_metrics["Persistent"]} Persistent Locations
 - {profile_metrics["Recurring"]} Recurring Locations
 - {profile_metrics["Transient"]} Transient Locations
 

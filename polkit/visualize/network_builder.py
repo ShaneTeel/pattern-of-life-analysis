@@ -100,7 +100,7 @@ class NetworkBuilder:
     def _build_node_trace(self, G:nx.DiGraph, pos:dict, digraph_data:pd.DataFrame):
         label_colors = {
             "Anchor": "gold",
-            "Habit": "steelblue",
+            "Persistent": "steelblue",
             "Recurring": "mediumseagreen",
             "Transient": "salmon",
             "Unknown": "gray"
