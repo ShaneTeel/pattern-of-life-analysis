@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import numpy as np
 import pandas as pd
+from scipy.stats import mode
 from shapely.geometry import MultiPoint
 from geopy.distance import great_circle
 
@@ -139,12 +140,15 @@ def normalized_entropy(weights, n_bins:int=None):
     
     total = sum(weights)
 
-    probas = [count / total for count in weights if total > 0]
+    if total == 0:
+        return 0.0
+
+    probas = [count / total for count in weights if total]
 
     shannon = -sum(p * np.log2(p) for p in probas if p > 0)
     
     if n_bins is None:
-        N = len(weights)
+        N = len(set(weights))
     else:
         N = n_bins
 
@@ -155,15 +159,14 @@ def normalized_consistency(X:pd.Series | list):
     if X is None or len(X) < 2:
         return 0.0
 
-    mean_X = np.mean(X)
-    range_X = np.max(X) - np.min(X)
-
+    X = np.array(X)
+    mode_X, mode_count = mode(X)
     
-    if mean_X > 0:
-        sensitive_CV = range_X / mean_X
-        return 1 / (sensitive_CV + 1)
-    else:
-        return 0.0
+    mode_std = np.sqrt(np.mean(X != mode_X))
+
+    mode_CV = mode_std / mode_count
+    print(f"Mode is {mode_X} with a count of {mode_count} and a STD of {mode_std} and a CV of {mode_CV} and a normalized consistency of {1 / (mode_CV + 1)}.")
+    return 1 / (mode_CV + 1)
     
 def exponential_saturation(X:int, half_life:int):
     return 1 - exponential_decay(X, half_life)

@@ -6,7 +6,7 @@ from scipy.stats import hmean
 from sklearn.preprocessing import MinMaxScaler
 from typing import Literal
 
-from polkit.analyze import radius_of_gyration, normalized_consistency, exponential_decay, exponential_saturation
+from polkit.analyze import radius_of_gyration, normalized_consistency, exponential_decay, exponential_saturation, normalized_entropy
 from .anchor_points import BedDownIdentifier, WorkIdentifier
 from polkit.utils import get_logger
 
@@ -114,9 +114,12 @@ class LocationProfiler:
         # Pre-Profiling Optimization 
         locs["hours"] = locs["arrived"].dt.hour
         locs["date"] = locs["arrived"].dt.date
+        locs["dwell_ceiled"] = np.ceil(locs["duration"])
         last = locs["arrived"].max()
         
         def profile_group(group:pd.Series):
+            print(f"Location ID: {group["loc_id"].unique()}")
+            print(f"Group Hours: {group["dwell_ceiled"].values}")
             return pd.Series({
                 "Lat": group["cluster_lat"].iloc[0],
                 "Lon": group["cluster_lon"].iloc[0],
@@ -129,16 +132,16 @@ class LocationProfiler:
                 "Last Seen": group["arrived"].max(),
                 "Total Visits": len(group), 
                 
-                "Arrival Consistency": normalized_consistency(group["hours"]),
-                "Dwell Consistency": normalized_consistency(group["duration"]),
+                "Arrival Consistency": 1 - normalized_entropy(group["hours"], n_bins=24),
+                "Dwell Consistency": normalized_consistency(group["dwell_ceiled"]),
                 "Gap Consistency": normalized_consistency(self._find_gaps(group["arrived"])),
 
                 "Recency": exponential_decay((last - group["arrived"].max()).days, 30),
                 "Depth": exponential_saturation(group["duration"].sum(), 4),
                 "Visit Count": exponential_saturation(len(group["arrived"]), 10),
             })
-
-        profile = locs.groupby("loc_id").apply(profile_group, include_groups=False).reset_index(names="Location ID")
+        
+        profile = locs.groupby("loc_id").apply(profile_group, include_groups=True).reset_index(names="Location ID")
     
         # Take harmonic mean of "Loyalty" metrics; assign Label
         profile["Loyalty Index"] = profile[["Recency", "Depth", "Visit Count"]].apply(hmean, axis=1)

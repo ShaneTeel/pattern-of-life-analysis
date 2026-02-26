@@ -186,12 +186,12 @@ class ChartMaker:
             polar=
             {
                 "angularaxis": {"rotation": 90},
-                "radialaxis": {"range": [0, data[col_names[0]].values.max()]}
+                "radialaxis": {"range": [0, 1]}
             },
             polar2=
             {
                 "angularaxis": {"rotation": 90},
-                "radialaxis": {"range": [0, data[col_names[1]].values.max()]}
+                "radialaxis": {"range": [0, 1]}
             },
             template="plotly_dark"
         )
