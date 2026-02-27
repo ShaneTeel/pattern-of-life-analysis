@@ -35,8 +35,8 @@ if __name__=="__main__":
     
     sps = detector.detect(pfs)
     locs = clusterer.cluster(sps)
-    weights = np.array(locs["n_points"].values)
 
+    weights = np.array(locs["n_points"].values)
     logger.info(f"Total Clusters: {locs["loc_id"].nunique()}")
     logger.info(f"Top 3 clusters account for: {np.sort(weights)[-3:].sum() / weights.sum():.2%}")
 

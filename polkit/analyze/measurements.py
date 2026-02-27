@@ -119,7 +119,7 @@ def centermost_point(cluster):
     centermost_point = min(cluster, key=lambda point: great_circle(point, centroid).m)
     return tuple(centermost_point)
 
-def normalized_entropy(weights, n_bins:int=None):
+def normalized_entropy(weights: pd.Series | np.ndarray, n_bins:int=None):
     '''
     Description
     -----------
@@ -129,30 +129,35 @@ def normalized_entropy(weights, n_bins:int=None):
     Parameters
     ----------
     weights : list
-        A list of weights representing the number of times or duration an individual spent at discrete locations.
+        A list of weights representing the count of duration / visits to discrete locations.
     
     Returns
     -------
     Entropy normalized
     '''
-    if weights is None or len(weights) <= 1:
-        return 1.0 # Single location == 100% unpredictability (one or none does not earn a high predictability)
+    if weights is None or len(weights) == 0:
+        return 1.0
+
+    if len(weights) == 1:
+        return 0.0 
     
     total = sum(weights)
 
     if total == 0:
-        return 0.0
+        return 1.0
 
-    probas = [count / total for count in weights if total]
+    probas = [w / total for w in weights]
 
     shannon = -sum(p * np.log2(p) for p in probas if p > 0)
     
     if n_bins is None:
-        N = len(set(weights))
+        N = len(weights)
     else:
         N = n_bins
+        if N <= 1:
+            return 0.0
 
-    max_entropy = np.log2(N)
+    max_entropy = np.log2(N)    
     return shannon / max_entropy
 
 def normalized_consistency(X:pd.Series | list):
@@ -160,12 +165,11 @@ def normalized_consistency(X:pd.Series | list):
         return 0.0
 
     X = np.array(X)
-    mode_X, mode_count = mode(X)
+    mode_X, _ = mode(X)
     
-    mode_std = np.sqrt(np.mean(X != mode_X))
+    mode_std = np.sqrt(np.mean((X - mode_X)**2))
 
-    mode_CV = mode_std / mode_count
-    print(f"Mode is {mode_X} with a count of {mode_count} and a STD of {mode_std} and a CV of {mode_CV} and a normalized consistency of {1 / (mode_CV + 1)}.")
+    mode_CV = mode_std / max(mode_X, 1e-7)
     return 1 / (mode_CV + 1)
     
 def exponential_saturation(X:int, half_life:int):

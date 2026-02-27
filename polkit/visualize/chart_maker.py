@@ -70,9 +70,11 @@ class ChartMaker:
         return bar_fig
     
     def create_location_profile_chart(self, data:pd.DataFrame):
-        col_names = [["Visit Count", "Recency", "Depth"], ["Arrival Consistency", "Dwell Consistency", "Gap Consistency"], ["Spatial Focus"]]
-        gauge_max = data[col_names[2][0]].values.max()
-
+        col_names = [
+            ["Visit Count", "Recency", "Depth", "Visit Count"], 
+            ["Arrival Consistency", "Dwell Consistency", "Gap Consistency", "Arrival Consistency"],
+            ["Spatial Focus"]
+        ]
 
         fig = make_subplots(
             rows=2,
@@ -86,22 +88,22 @@ class ChartMaker:
 
         fig.add_trace(
             go.Scatterpolar(
-                r=data.loc[0, col_names[0]].values,
+                r=list(data.loc[0, col_names[0]].values) + [data.loc[0, col_names[0]].values[0]],
                 theta=col_names[0],
                 fill="toself",
                 name="Loyalty",
-                mode="none"
+                mode="lines"
             ),
             row=1, col=1
         )
 
         fig.add_trace(
             go.Scatterpolar(
-                r=data.loc[0, col_names[1]].values,
+                r=list(data.loc[0, col_names[1]].values) + [data.loc[0, col_names[1]].values[0]],
                 theta=col_names[1],
                 fill="toself",
                 name="Predictability",
-                mode="none"
+                mode="lines"
             ),
             row=1, col=2
         )
@@ -111,7 +113,7 @@ class ChartMaker:
                 value=data.loc[0, col_names[2][0]],
                 mode="gauge",
                 title={"text": "Spatial Focus"},
-                gauge={"axis": {"range": [0, gauge_max]}}
+                gauge={"axis": {"range": [0, 1]}}
             ),
             row=2, col=1
         )
@@ -125,21 +127,21 @@ class ChartMaker:
                 go.Frame(
                     data=[
                         go.Scatterpolar(
-                            r=loc[col_names[0]].values,
+                            r=list(loc[col_names[0]].values) + [loc[col_names[0]].values[0]],
                             theta=col_names[0],
                             fill="toself",
-                            mode="none"
+                            mode="lines"
                         ),
                         go.Scatterpolar(
-                            r=loc[col_names[1]].values,
+                            r=list(loc[col_names[1]].values) + [loc[col_names[1]].values[0]],
                             theta=col_names[1],
                             fill="toself",
-                            mode="none"
+                            mode="lines"
                         ),
                         go.Indicator(
                             value=loc[col_names[2][0]],
                             mode="gauge",
-                            gauge={"axis": {"range": [0, gauge_max]}}
+                            gauge={"axis": {"range": [0, 1]}}
                         )
                     ],
                     name=loc_id,
@@ -186,12 +188,12 @@ class ChartMaker:
             polar=
             {
                 "angularaxis": {"rotation": 90},
-                "radialaxis": {"range": [0, 1]}
+                "radialaxis": {"range": [0, 1], "tickvals": [0, 0.2, 0.4, 0.6, 0.8, 1.0]}
             },
             polar2=
             {
                 "angularaxis": {"rotation": 90},
-                "radialaxis": {"range": [0, 1]}
+                "radialaxis": {"range": [0, 1], "tickvals": [0, 0.2, 0.4, 0.6, 0.8, 1.0]}
             },
             template="plotly_dark"
         )
