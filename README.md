@@ -177,7 +177,7 @@ flowchart LR;
 [Return to TOC](#table-of-contents)
 
 ## Methods
-![Profile Chart](./media/profile-chart.png)
+![Profile Chart](./media/profile_chart.png)
 
 ### Maturity Index
 
