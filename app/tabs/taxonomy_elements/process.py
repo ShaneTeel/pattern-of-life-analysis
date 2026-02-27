@@ -39,10 +39,10 @@ def run_process(det_configs, cluster_configs, sleep_configs, work_configs):
     H = 1 - normalized_entropy(profiles["Total Visits"])
 
     locations = len(profiles)
-    anchors = len(profiles[profiles["Loyalty Label"] == "Anchor"])
-    persistent = len(profiles[profiles["Loyalty Label"] == "Persistent"])
-    recurring = len(profiles[profiles["Loyalty Label"] == "Recurring"])
-    transient = len(profiles[profiles["Loyalty Label"] == "Transient"])
+    anchors = len(profiles[profiles["Maturity Label"] == "Anchor"])
+    persistent = len(profiles[profiles["Maturity Label"] == "Persistent"])
+    recurring = len(profiles[profiles["Maturity Label"] == "Recurring"])
+    transient = len(profiles[profiles["Maturity Label"] == "Transient"])
     homes = len(profiles[profiles["Candidate Home"] == True])
     works = len(profiles[profiles["Candidate Work"] == True])
 
@@ -50,7 +50,7 @@ def run_process(det_configs, cluster_configs, sleep_configs, work_configs):
         "Rg": Rg,
         "cm": cm,
         "H": H,
-        "Confidence": "HIGH" if H > 0.66 else "MODERATE" if H > 0.33 else "LOW",
+        "Certainty": "HIGH" if H > 0.66 else "MODERATE" if H > 0.33 else "LOW",
         "Locations": locations,
         "Anchors": anchors,
         "Persistent": persistent,

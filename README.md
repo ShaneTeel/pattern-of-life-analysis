@@ -179,21 +179,21 @@ flowchart LR;
 ## Methods
 ![Profile Chart](./media/profile-chart.png)
 
-### Loyalty Index
+### Maturity Index
 
-`Loyalty` measures the stability of a user's relationship with a location over time. 
+`Maturity` measures the stability of a user's relationship with a location over time. 
 
-$$\text{Loyalty}=\frac{3}{\Large\frac{1}{D_{rec}}+\frac{1}{S_{\text{dur, hr}}}+\frac{1}{S_{\text{vis}}}}$$
+$$\text{Maturity}=\frac{3}{\Large\frac{1}{D_{rec}}+\frac{1}{S_{\text{dur, hr}}}+\frac{1}{S_{\text{vis}}}}$$
 
-`Loyalty` addresses the following hypotheticals:
+`Maturity` addresses the following hypotheticals:
 
-- Scenario 1: A user once lived at 12345 Old Home Address and as such, Old Home Address has a high visit count. However, three-months ago the user moved to 67901 New Home Address. 90-days have passed since the user lived at Old Home Address. In this scenario, the system attenutates a user's `Loyalty` to Location the Old Home to avoid a high-visit count misrepresenting the significance of the location.
+- Scenario 1: A user once lived at 12345 Old Home Address and as such, Old Home Address has a high visit count. However, three-months ago the user moved to 67901 New Home Address. 90-days have passed since the user lived at Old Home Address. In this scenario, the system attenutates a user's `Maturity` to Location the Old Home to avoid a high-visit count misrepresenting the significance of the location.
 
-- Scenario 2: A user recently started visiting a new gym in response to a promotion from the gym offering a 30-day free trial. The user's visits are all fairly recent (past 30-days), which could indicate a new habit. In this scenario, a few recent visits to a new location does not indicate a pattern. A user must visit a location beyond a specific threshold before a location's `Loyalty` score is amplified.
+- Scenario 2: A user recently started visiting a new gym in response to a promotion from the gym offering a 30-day free trial. The user's visits are all fairly recent (past 30-days), which could indicate a new habit. In this scenario, a few recent visits to a new location does not indicate a pattern. A user must visit a location beyond a specific threshold before a location's `Maturity` score is amplified.
 
-In short, neither the recency, nor the count, nor the total dwell should independently dictate the significance of a location. `Loyalty` aims to mitigate this issue.
+In short, neither the recency, nor the count, nor the total dwell should independently dictate the significance of a location. `Maturity` aims to mitigate this issue.
 
-A user's `Loyalty` to a location is influenced by three factors:
+A user's `Maturity` to a location is influenced by three factors:
 
 1. the number of days since the user's last visit (`Recency`)
 
@@ -213,7 +213,7 @@ $$S_{vis}(v) = 1 - e^{\large(\frac{-\ln(2)}{v_{1/2}}\cdot{v})}$$
 
 $$v_{1/2} = {10}\text{ visits }\text{(default value)}$$
 
-### Loyalty Label
+### Maturity Label
 
 **Anchor (top rating)** - The location represents the center of gravity for a User's movements. Home is typically an anchor. However, data quality will ultimately affect classification.
 
@@ -224,14 +224,12 @@ $$v_{1/2} = {10}\text{ visits }\text{(default value)}$$
 **Transient (worst)** - Either not a destination (i.e., a way-point) or a location that lacks enough history to be qualified for any other class (Transient == Outlier).
 
 ### Predictability Index
-`Predictability` is a measure of consistency across three vectors:
+`Predictability` is a measure of certainty across three vectors:
 1. Arrival hour
-2. Dwell Time (in hours)
+2. Dwell Time (in hours, rounded to nearest hour) (minimum duration for a Stay-Point is 30 minutes, so all rounded dwell times will be in the range of `[1, 23)`)
 3. Gaps (in days) between visits
 
-The formula for measuring consistency (below) is normalized to a range of [0, 1] with 1 == absolute consistency and 0 == no consistency. The function returns 0 for a specific vector if the location has less that two visits or there are less than two measured gaps between visits.
-
-$$P(x) = {\frac{1}{\large\frac{\max({x}) - \min({x})}{\mu({x})}}}$$
+The formula used is an inverted Normalized Shannon Entropy (NSE), normalized between [0, 1]. 1 == absolute certainty and 0 == no certainty. 
 
 [Return to TOC](#table-of-contents)
 

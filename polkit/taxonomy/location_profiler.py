@@ -28,9 +28,9 @@ class LocationProfiler:
     _COL_ORDER = ["Location ID", 
                   "Lat", "Lon", "Spatial Focus", 
                   "Total Dwell", "First Seen", "Last Seen", "Total Visits", 
-                  "Arrival Consistency", "Dwell Consistency", "Gap Consistency",
+                  "Arrival Certainty", "Dwell Certainty", "Gap Certainty",
                   "Recency", "Depth", "Visit Count",
-                  "Loyalty Index", "Predictability Index", "Loyalty Label"]
+                  "Maturity Index", "Maturity Label", "Predictability Index", ]
 
     _OPTIONS = ["Transient", "Recurring", "Persistent", "Anchor"]
 
@@ -130,9 +130,9 @@ class LocationProfiler:
                 "Last Seen": group["arrived"].max(),
                 "Total Visits": len(group), 
                 
-                "Arrival Consistency": 1 - normalized_entropy(group["hours"].value_counts().values, n_bins=24),
-                "Dwell Consistency": 1 - normalized_entropy(group["dwell_rounded"].value_counts().values),
-                "Gap Consistency": 1 - normalized_entropy(self._find_gaps(group["arrived"])),
+                "Arrival Certainty": 1 - normalized_entropy(group["hours"].value_counts().values, n_bins=24),
+                "Dwell Certainty": 1 - normalized_entropy(group["dwell_rounded"].value_counts().values),
+                "Gap Certainty": 1 - normalized_entropy(self._find_gaps(group["arrived"])),
 
                 "Recency": exponential_decay((last - group["arrived"].max()).days, 30),
                 "Depth": exponential_saturation(group["duration"].sum(), 4),
@@ -141,12 +141,12 @@ class LocationProfiler:
         
         profile = locs.groupby("loc_id").apply(profile_group, include_groups=False).reset_index(names="Location ID")
     
-        # Take harmonic mean of "Loyalty" metrics; assign Label
-        profile["Loyalty Index"] = profile[["Recency", "Depth", "Visit Count"]].apply(hmean, axis=1)
-        profile["Loyalty Label"] = self._assign_label(profile["Loyalty Index"])
+        # Take harmonic mean of "Maturity" metrics; assign Label
+        profile["Maturity Index"] = profile[["Recency", "Depth", "Visit Count"]].apply(hmean, axis=1)
+        profile["Maturity Label"] = self._assign_label(profile["Maturity Index"])
 
         # Determine which locations are assessed for "Predictiability"
-        profile["Predictability Index"] = profile[["Arrival Consistency", "Dwell Consistency", "Gap Consistency"]].mean(axis=1)
+        profile["Predictability Index"] = profile[["Arrival Certainty", "Dwell Certainty", "Gap Certainty"]].mean(axis=1)
 
         return profile[self._COL_ORDER].sort_values(by="Location ID")
     
@@ -181,9 +181,9 @@ class LocationProfiler:
         profile_df["Hover"] = profile_df.apply(lambda x: f"""
 <b>Location ID</b>: {int(x["Location ID"])}<br>
 <b>Spatial Focus</b>: {x["Spatial Focus"]:.2f} meters<br>
-<b>Loyalty</b>: {x["Loyalty Index"]:.2%}<br>
+<b>Maturity</b>: {x["Maturity Index"]:.2%}<br>
 <b>Predictability</b>: {x["Predictability Index"]:.2%}<br>
-<b>Classification</b>: {x["Loyalty Label"]}<br>
+<b>Classification</b>: {x["Maturity Label"]}<br>
 <b>Home / Work Candidacy</b>: {"Home, Work" if x["Candidate Home"] and x["Candidate Work"] else "Home" if x["Candidate Home"] else "Work" if x["Candidate Work"] else ""}<br>
 """, axis=1)
                 
@@ -199,10 +199,10 @@ class LocationProfiler:
 
     def get_likely_home(self):
         if self.sleep_df is None:
-            return self.profile_df.loc[self.profile_df["Loyalty Index"].idxmax(), "Location_ID"]
+            return self.profile_df.loc[self.profile_df["Maturity Index"].idxmax(), "Location_ID"]
         
         home_subset = self.profile_df[self.profile_df["Candidate Home"] == True]
-        return home_subset.loc[home_subset["Loyalty Index"].idxmax(), "Location ID"]
+        return home_subset.loc[home_subset["Maturity Index"].idxmax(), "Location ID"]
     
     def _find_gaps(self, visit_dates:pd.Series):
 

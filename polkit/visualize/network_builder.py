@@ -118,7 +118,7 @@ class NetworkBuilder:
 
             if not profile_row.empty:
                 hover = profile_row["Hover"].iloc[0]
-                classification = profile_row["Loyalty Label"].iloc[0]
+                classification = profile_row["Maturity Label"].iloc[0]
                 node_colors.append(label_colors[classification])
             else:
                 hover = f"Location: {node}"

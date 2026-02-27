@@ -23,8 +23,7 @@ User {user_id}'s overall spatial focus (weighted by dwell-time) is {profile_metr
 
 Next-location prediction for User {user_id} achieves {eval_metrics["next_step_accuracy"]:.2%} next-step accuracy and a Top-{eval_metrics["k"]} accuracy of {eval_metrics["top_k"]:.2%},
 demonstrating a ~{eval_metrics["improvement"]:.2f}% improvement over a random top-{eval_metrics["k"]} guess ({eval_metrics["rand_top_k"]:.2f}%).
-Given that User {user_id}'s movements are characterized by a {profile_metrics["H"]:.2%} level of overall certainty, 
-Taxonomy has {profile_metrics["Confidence"]} confidence in it's ability to forecast User {user_id}'s movements.
+Given that User {user_id}'s movements are characterized by a {profile_metrics["H"]:.2%} level of overall certainty.
 """
                 st.session_state["analytic_summary"] = analytic_summary
             if st.session_state["analytic_summary"] is not None:

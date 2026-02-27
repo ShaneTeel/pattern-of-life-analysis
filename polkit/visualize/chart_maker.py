@@ -72,7 +72,7 @@ class ChartMaker:
     def create_location_profile_chart(self, data:pd.DataFrame):
         col_names = [
             ["Visit Count", "Recency", "Depth", "Visit Count"], 
-            ["Arrival Consistency", "Dwell Consistency", "Gap Consistency", "Arrival Consistency"],
+            ["Arrival Certainty", "Dwell Certainty", "Gap Certainty", "Arrival Certainty"],
             ["Spatial Focus"]
         ]
 
@@ -91,7 +91,7 @@ class ChartMaker:
                 r=list(data.loc[0, col_names[0]].values) + [data.loc[0, col_names[0]].values[0]],
                 theta=col_names[0],
                 fill="toself",
-                name="Loyalty",
+                name="Maturity",
                 mode="lines"
             ),
             row=1, col=1
@@ -211,7 +211,7 @@ class ChartMaker:
                 mode="lines+markers",
                 name="Temporal Stability",
                 hoverinfo="all",
-                marker=dict(color=self._LABEL_COLORS[loc["Loyalty Label"]], symbol="diamond"),
+                marker=dict(color=self._LABEL_COLORS[loc["Maturity Label"]], symbol="diamond"),
                 line=dict(width=3)
             ))
 
