@@ -250,7 +250,7 @@ If you use this package or software, please cite it as follows:
 
 ## License
 
-This project is licensed under the term of the [GNU General Public License v3.0](./LICENSE)
+This project is licensed under an All Rights Reserved [License](./LICENSE)
 
 **Copyright (c) 2026 Shane Teel**
 
