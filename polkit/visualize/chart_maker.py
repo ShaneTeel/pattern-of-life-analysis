@@ -211,7 +211,7 @@ class ChartMaker:
                 mode="lines+markers",
                 name="Temporal Stability",
                 hoverinfo="all",
-                marker=dict(color=self._LABEL_COLORS[loc["Classification"]], symbol="diamond"),
+                marker=dict(color=self._LABEL_COLORS[loc["Maturity Label"]], symbol="diamond"),
                 line=dict(width=3)
             ))
 

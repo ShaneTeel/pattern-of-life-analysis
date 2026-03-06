@@ -213,17 +213,7 @@ $$S_{vis}(v) = 1 - e^{\large(\frac{-\ln(2)}{v_{1/2}}\cdot{v})}$$
 
 $$v_{1/2} = {10}\text{ visits }\text{(default value)}$$
 
-### Predictability Index
-`Predictability` is a measure of certainty across three vectors:
-1. Arrival hour
-2. Dwell Time (in hours, rounded to nearest hour) (minimum duration for a Stay-Point is 30 minutes, so all rounded dwell times will be in the range of `[1, 23)`)
-3. Gaps (in days) between visits
-
-The formula used is an inverted Normalized Shannon Entropy (NSE), normalized between [0, 1]. 1 == absolute certainty and 0 == no certainty. 
-
-### Classification
-
-Determined by taking the arithmetic mean of both the `Predictability` index and the `Maturity` index. Definitions below.
+### Maturity Label Definitions
 
 **Anchor (top rating)** - The location represents a center of gravity for a User's movements. Home is typically an anchor. However, data quality will ultimately affect classification.
 
@@ -232,6 +222,14 @@ Determined by taking the arithmetic mean of both the `Predictability` index and 
 **Recurring (3rd best)** - User visits the location, but the visits do not persist across the collection range (a grocery store, the movies, etc.). It, like all the other two above, is a destination, but it's not one with enough relational history with the user. (i.e., why it's not persistent).
 
 **Transient (worst)** - Either not a destination (i.e., a way-point) or a location that lacks enough history to be qualified for any other class (Transient == Outlier).
+
+### Predictability Index
+`Predictability` is a measure of certainty across three vectors:
+1. Arrival hour
+2. Dwell Time (in hours, rounded to nearest hour) (minimum duration for a Stay-Point is 30 minutes, so all rounded dwell times will be in the range of `[1, 23)`)
+3. Gaps (in days) between visits
+
+The formula uses an inverted Normalized Shannon Entropy (NSE), normalized between [0, 1]. 1 == absolute certainty and 0 == no certainty. 
 
 [Return to TOC](#table-of-contents)
 

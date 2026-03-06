@@ -16,7 +16,7 @@ class LocationProfiler:
     '''
     Classifies locations by a routine score that is computed based on visit ratio, dwell ratio, predictability, and regularity.
     
-    Classification system assigns:
+    Maturity Label system assigns:
     - "Anchor": Core locations; serve as the backbone of the User's pattern
     - "Persistent": Not a hub, but location persists throughout the data 
     - "Recurring": Secondary interests; low-density
@@ -30,7 +30,7 @@ class LocationProfiler:
                   "Total Dwell", "First Seen", "Last Seen", "Total Visits", 
                   "Arrival Certainty", "Dwell Certainty", "Gap Certainty",
                   "Recency", "Depth", "Visit Count",
-                  "Maturity Index", "Predictability Index", "Classification"]
+                  "Maturity Index", "Maturity Label", "Predictability Index"]
 
     _OPTIONS = ["Transient", "Recurring", "Persistent", "Anchor"]
 
@@ -147,17 +147,17 @@ class LocationProfiler:
         # Determine which locations are assessed for "Predictiability"
         profile["Predictability Index"] = profile[["Arrival Certainty", "Dwell Certainty", "Gap Certainty"]].mean(axis=1)
 
-        # Assign label based on Maturity / Predictability average
-        profile["Classification"] = self._assign_label(profile[["Maturity Index", "Predictability Index"]].mean(axis=1))
+        # Assign label based on Maturity score
+        profile["Maturity Label"] = self._assign_label(profile["Maturity Index"])
 
         return profile[self._COL_ORDER].sort_values(by="Location ID")
     
     def _assign_label(self, score:pd.Series):
         
         conditions = [
-            score >= 0.66,
-            score >= 0.33,
-            score >= 0.05
+            score >= 0.70,
+            score >= 0.35,
+            score >= 0.25
         ]
         choices = self._OPTIONS[-3:][::-1]
         return pd.Series(np.select(
@@ -185,7 +185,7 @@ class LocationProfiler:
 <b>Spatial Focus</b>: {x["Spatial Focus"]:.2f} meters<br>
 <b>Maturity</b>: {x["Maturity Index"]:.2%}<br>
 <b>Predictability</b>: {x["Predictability Index"]:.2%}<br>
-<b>Classification</b>: {x["Classification"]}<br>
+<b>Maturity Label</b>: {x["Maturity Label"]}<br>
 <b>Home / Work Candidacy</b>: {"Home, Work" if x["Candidate Home"] and x["Candidate Work"] else "Home" if x["Candidate Home"] else "Work" if x["Candidate Work"] else ""}<br>
 """, axis=1)
                 
