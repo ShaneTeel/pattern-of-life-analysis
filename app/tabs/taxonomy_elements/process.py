@@ -39,10 +39,10 @@ def run_process(det_configs, cluster_configs, sleep_configs, work_configs):
     H = 1 - normalized_entropy(profiles["Total Visits"])
 
     locations = len(profiles)
-    anchors = len(profiles[profiles["Maturity Label"] == "Anchor"])
-    persistent = len(profiles[profiles["Maturity Label"] == "Persistent"])
-    recurring = len(profiles[profiles["Maturity Label"] == "Recurring"])
-    transient = len(profiles[profiles["Maturity Label"] == "Transient"])
+    anchors = len(profiles[profiles["Classification"] == "Anchor"])
+    persistent = len(profiles[profiles["Classification"] == "Persistent"])
+    recurring = len(profiles[profiles["Classification"] == "Recurring"])
+    transient = len(profiles[profiles["Classification"] == "Transient"])
     homes = len(profiles[profiles["Candidate Home"] == True])
     works = len(profiles[profiles["Candidate Work"] == True])
 

@@ -30,7 +30,7 @@ class LocationProfiler:
                   "Total Dwell", "First Seen", "Last Seen", "Total Visits", 
                   "Arrival Certainty", "Dwell Certainty", "Gap Certainty",
                   "Recency", "Depth", "Visit Count",
-                  "Maturity Index", "Maturity Label", "Predictability Index", ]
+                  "Maturity Index", "Predictability Index", "Classification"]
 
     _OPTIONS = ["Transient", "Recurring", "Persistent", "Anchor"]
 
@@ -141,20 +141,22 @@ class LocationProfiler:
         
         profile = locs.groupby("loc_id").apply(profile_group, include_groups=False).reset_index(names="Location ID")
     
-        # Take harmonic mean of "Maturity" metrics; assign Label
+        # Take harmonic mean of "Maturity" metrics
         profile["Maturity Index"] = profile[["Recency", "Depth", "Visit Count"]].apply(hmean, axis=1)
-        profile["Maturity Label"] = self._assign_label(profile["Maturity Index"])
 
         # Determine which locations are assessed for "Predictiability"
         profile["Predictability Index"] = profile[["Arrival Certainty", "Dwell Certainty", "Gap Certainty"]].mean(axis=1)
+
+        # Assign label based on Maturity / Predictability average
+        profile["Classification"] = self._assign_label(profile[["Maturity Index", "Predictability Index"]].mean(axis=1))
 
         return profile[self._COL_ORDER].sort_values(by="Location ID")
     
     def _assign_label(self, score:pd.Series):
         
         conditions = [
-            score >= 0.50,
-            score >= 0.25,
+            score >= 0.66,
+            score >= 0.33,
             score >= 0.05
         ]
         choices = self._OPTIONS[-3:][::-1]
@@ -183,7 +185,7 @@ class LocationProfiler:
 <b>Spatial Focus</b>: {x["Spatial Focus"]:.2f} meters<br>
 <b>Maturity</b>: {x["Maturity Index"]:.2%}<br>
 <b>Predictability</b>: {x["Predictability Index"]:.2%}<br>
-<b>Classification</b>: {x["Maturity Label"]}<br>
+<b>Classification</b>: {x["Classification"]}<br>
 <b>Home / Work Candidacy</b>: {"Home, Work" if x["Candidate Home"] and x["Candidate Work"] else "Home" if x["Candidate Home"] else "Work" if x["Candidate Work"] else ""}<br>
 """, axis=1)
                 

@@ -2,7 +2,7 @@ import pickle
 import numpy as np
 
 from polkit.taxonomy import *
-from polkit.strategy import *
+from polkit.predict import *
 from polkit.visualize import ChartMaker
 from polkit.utils import get_logger, setup_logging, train_test_split
 

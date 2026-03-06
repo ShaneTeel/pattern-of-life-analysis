@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
 
-from polkit.strategy import MarkovChain, MarkovEvaluator
+from polkit.predict import MarkovChain, MarkovEvaluator
 from polkit.utils import get_logger, train_test_split
 
 logger = get_logger(__name__)

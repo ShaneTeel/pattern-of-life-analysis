@@ -11,7 +11,6 @@ logger = get_logger(__name__)
 class MarkovEvaluator:
 
     def __init__(self, markov_model:MarkovChain, k:int=3):
-
         '''
         Parameters
         ----------
@@ -58,8 +57,8 @@ class MarkovEvaluator:
         for i, sequence in enumerate(test_sequences):
             if len(sequence) < 2:
                 logger.info(f"Sequence at index {i} contains less than 2 points. Skipping")
-                continue
-                
+                continue            
+
             for j in range(len(sequence) - 1):
                 # Get X_test, y_true
                 X_test = sequence[j]
