@@ -130,7 +130,7 @@ class MapMaker:
         for _, row in locs_df.iterrows():
             pt = row[["Lat", "Lon"]].values.tolist()
             radius = row["Spatial Focus"]
-            info = f"Location Id: {row["Location ID"]}<br>Spatial Focus: {radius:.2f} (meters)"
+            info = f"Location Id: {row['Location ID']}<br>Spatial Focus: {radius:.2f} (meters)"
             folium.Circle(
                 location=pt,
                 popup=info,

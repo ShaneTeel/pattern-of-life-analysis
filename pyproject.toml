@@ -22,23 +22,23 @@ classifiers = [
 ]
 
 dependencies = [
-    "numpy>=1.24.0",
-    "scipy>=1.17.0",
-    "pandas>=2.0.0",
-    "pytz",
+    "numpy==2.4.4",
+    "scipy==1.17.1",
+    "pandas==3.0.2",
+    "pytz==2026.1.post1",
 
-    "shapely>=2.1.2",
-    "geopy>=2.4.1",
+    "shapely==2.1.2",
+    "geopy==2.4.1",
 
-    "scikit-learn>=1.8.0",
+    "scikit-learn==1.8.0",
 
-    "plotly>=6.5.2",
-    "calplot>=0.1.7.5",
-    "folium>=0.20.0",
-    "networkx>=3.6.1",
+    "plotly==6.7.0",
+    "calplot==0.1.7.5",
+    "folium==0.20.0",
+    "networkx==3.6.1",
 
-    "streamlit>=1.33.0",
-    "streamlit-folium>=0.26.1"
+    "streamlit==1.56.0",
+    "streamlit-folium==0.27.1"
     ]
 
 [project.urls]

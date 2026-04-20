@@ -225,11 +225,11 @@ class MarkovEvaluator:
         summary += "MarkovChain Evaluator Results\n"
         summary += "="*50
         summary += "\n"
-        summary += f"\tNext-Step Accuracy: {self.results["next_step"]:.2%}\n"
-        summary += f"\tTop-{self.k} Accuracy: {self.results["top_k"]:.2%}\n"
+        summary += f"\tNext-Step Accuracy: {self.results['next_step']:.2%}\n"
+        summary += f"\tTop-{self.k} Accuracy: {self.results['top_k']:.2%}\n"
         summary += f"\tTop-{self.k} Accuracy by State\n"
-        for state, stat in sorted(self.results["top_k_by_state"].items()):
-            summary += f"\t\tState {state}: {stat["ratio"]:.2%} ({stat["correct"]} / {stat["total"]})\n"
+        for state, stat in sorted(self.results['top_k_by_state'].items()):
+            summary += f"\t\tState {state}: {stat['ratio']:.2%} ({stat['correct']} / {stat['total']})\n"
         
         n_states = len(set(self.test_states))
         

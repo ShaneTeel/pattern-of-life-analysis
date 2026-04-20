@@ -1,2 +1,1 @@
-# GitHub Package
 polkit @ git+https://github.com/ShaneTeel/pattern-of-life-analysis.git@main
